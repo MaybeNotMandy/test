@@ -5,7 +5,7 @@ local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 
--- Temas pré-definidos (igual à Kavo original)
+-- Temas pré-definidos
 local Themes = {
     DarkTheme = {
         SchemeColor = Color3.fromRGB(64, 64, 64),
@@ -38,7 +38,7 @@ local function Tween(object, properties, duration)
     return tween
 end
 
--- Função para habilitar arrastar (igual à Kavo)
+-- Função para habilitar arrastar
 function SimpleKavo:DraggingEnabled(frame, parent)
     parent = parent or frame
     local dragging = false
@@ -72,7 +72,7 @@ function SimpleKavo:DraggingEnabled(frame, parent)
     end)
 end
 
--- Função principal (igual ao estilo Kavo)
+-- Função principal
 function SimpleKavo.CreateLib(title, themeName)
     -- Seleciona o tema
     local theme = Themes[themeName] or Themes.Default
@@ -81,6 +81,7 @@ function SimpleKavo.CreateLib(title, themeName)
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Parent = game.CoreGui
     ScreenGui.Name = "SimpleKavo_"..tostring(math.random(1, 10000))
+    ScreenGui.ResetOnSpawn = false
     
     -- Janela principal
     local Main = Instance.new("Frame")
@@ -118,11 +119,12 @@ function SimpleKavo.CreateLib(title, themeName)
     Title.TextSize = 16
     Title.TextXAlignment = Enum.TextXAlignment.Left
     
-    -- Botão de fechar
+    -- Botão de fechar (ajustado para direita)
     local Close = Instance.new("ImageButton")
     Close.Parent = Header
     Close.BackgroundTransparency = 1
-    Close.Position = UDim2.new(0.93, 0, 0.15, 0)
+    Close.AnchorPoint = Vector2.new(1, 0)
+    Close.Position = UDim2.new(1, -5, 0.15, 0)
     Close.Size = UDim2.new(0, 20, 0, 20)
     Close.Image = "rbxassetid://3926305904"
     Close.ImageRectOffset = Vector2.new(284, 4)
@@ -131,6 +133,29 @@ function SimpleKavo.CreateLib(title, themeName)
         Tween(Main, {Size = UDim2.new(0, 0, 0, 0)})
         wait(0.3)
         ScreenGui:Destroy()
+    end)
+    
+    -- Botão de minimizar (fora do GUI)
+    local Minimize = Instance.new("ImageButton")
+    Minimize.Parent = ScreenGui
+    Minimize.Name = "MinimizeButton"
+    Minimize.BackgroundTransparency = 1
+    Minimize.Size = UDim2.new(0, 40, 0, 40)
+    Minimize.Position = UDim2.new(1, -50, 0, 10)
+    Minimize.Image = "rbxassetid://3926305904"
+    Minimize.ImageRectOffset = Vector2.new(124, 4)
+    Minimize.ImageRectSize = Vector2.new(24, 24)
+    
+    local Minimized = false
+    Minimize.MouseButton1Click:Connect(function()
+        Minimized = not Minimized
+        if Minimized then
+            Tween(Main, {Size = UDim2.new(0, 0, 0, 0)})
+            Minimize.ImageRectOffset = Vector2.new(84, 4)
+        else
+            Tween(Main, {Size = UDim2.new(0, 500, 0, 350)})
+            Minimize.ImageRectOffset = Vector2.new(124, 4)
+        end
     end)
     
     -- Habilita arrastar
@@ -371,6 +396,9 @@ function SimpleKavo.CreateLib(title, themeName)
         AddTab = SimpleKavo.AddTab,
         ToggleUI = function()
             ScreenGui.Enabled = not ScreenGui.Enabled
+        end,
+        Destroy = function()
+            ScreenGui:Destroy()
         end
     }
 end
