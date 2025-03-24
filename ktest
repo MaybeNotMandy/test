@@ -122,7 +122,7 @@ function SimpleKavo.CreateLib(title, themeName)
     local Close = Instance.new("ImageButton")
     Close.Parent = Header
     Close.BackgroundTransparency = 1
-    Close.Position = UDim2.new(0.9, 0, 0.15, 0)
+    Close.Position = UDim2.new(1, 0, 0.15, 0)
     Close.Size = UDim2.new(0, 20, 0, 20)
     Close.Image = "rbxassetid://3926305904"
     Close.ImageRectOffset = Vector2.new(284, 4)
