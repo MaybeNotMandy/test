@@ -1,8 +1,11 @@
+local SimpleKavo = {}
+
+-- Serviços
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 
--- Temas pré-definidos
+-- Temas pré-definidos (ATUALIZADO COM BLOODTHEME)
 local Themes = {
     DarkTheme = {
         SchemeColor = Color3.fromRGB(64, 64, 64),
@@ -18,21 +21,22 @@ local Themes = {
         TextColor = Color3.fromRGB(0, 0, 0),
         ElementColor = Color3.fromRGB(224, 224, 224)
     },
+    BloodTheme = {  -- NOVO TEMA ADICIONADO
+        SchemeColor = Color3.fromRGB(227, 27, 27),  -- Vermelho sangue
+        Background = Color3.fromRGB(10, 10, 10),    -- Preto quase puro
+        Header = Color3.fromRGB(5, 5, 5),           -- Preto mais escuro
+        TextColor = Color3.fromRGB(255, 255, 255),  -- Texto branco
+        ElementColor = Color3.fromRGB(20, 20, 20)   -- Elementos escuros
+    },
     Default = {
         SchemeColor = Color3.fromRGB(74, 99, 135),
         Background = Color3.fromRGB(36, 37, 43),
         Header = Color3.fromRGB(28, 29, 34),
         TextColor = Color3.fromRGB(255, 255, 255),
         ElementColor = Color3.fromRGB(32, 32, 38)
-    },
-    BloodTheme = {
-        SchemeColor = Color3.fromRGB(255, 0, 0)
-        Background = Color3.fromRGB(0, 0, 0)
-        Header = Color3.fromRGB(0, 0, 0)
-        TextColor = Color3.fromRGB(0, 0, 0)
-        ElementColor = Color3.fromRGB(0, 0, 0)
     }
 }
+
 
 -- Função para criar tweens
 local function Tween(object, properties, duration)
