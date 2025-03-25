@@ -277,8 +277,6 @@ function SimpleKavo.CreateLib(title, themeName)
             Button.Text = name
             Button.TextColor3 = theme.TextColor
             Button.TextSize = 14
-            -- Removi Position e AnchorPoint fixos para permitir que UIListLayout gerencie a posição
-            -- Adicionei centralização
             Button.AnchorPoint = Vector2.new(0.5, 0)
             
             local ButtonCorner = Instance.new("UICorner")
@@ -289,7 +287,6 @@ function SimpleKavo.CreateLib(title, themeName)
                 if callback then callback() end
             end)
             
-            -- Retorna o botão com função para mudar posição
             return {
                 Button = Button,
                 SetPosition = function(xScale, xOffset, yScale, yOffset)
@@ -435,6 +432,124 @@ function SimpleKavo.CreateLib(title, themeName)
                 end,
                 Get = function()
                     return tonumber(string.match(SliderText.Text, "%d+"))
+                end
+            }
+        end
+        
+        -- Nova função: AddDropdown
+        function TabFunctions:AddDropdown(name, options, defaultOption, callback)
+            local dropdownOpen = false
+            local currentOption = defaultOption or (options and options[1]) or "Selecione"
+            
+            -- Frame principal do dropdown
+            local DropdownFrame = Instance.new("Frame")
+            DropdownFrame.Name = name.."_Dropdown"
+            DropdownFrame.Parent = TabContent
+            DropdownFrame.BackgroundTransparency = 1
+            DropdownFrame.Size = UDim2.new(0.85, 0, 0, 35)
+            DropdownFrame.ClipsDescendants = true
+            
+            -- Botão principal (como um botão normal)
+            local MainButton = Instance.new("TextButton")
+            MainButton.Name = "MainButton"
+            MainButton.Parent = DropdownFrame
+            MainButton.BackgroundColor3 = theme.ElementColor
+            MainButton.Size = UDim2.new(1, 0, 0, 35)
+            MainButton.Font = Enum.Font.Gotham
+            MainButton.Text = name..": "..currentOption
+            MainButton.TextColor3 = theme.TextColor
+            MainButton.TextSize = 14
+            
+            local ButtonCorner = Instance.new("UICorner")
+            ButtonCorner.CornerRadius = UDim.new(0, 4)
+            ButtonCorner.Parent = MainButton
+            
+            -- Container para as opções
+            local OptionsFrame = Instance.new("Frame")
+            OptionsFrame.Name = "OptionsFrame"
+            OptionsFrame.Parent = DropdownFrame
+            OptionsFrame.BackgroundTransparency = 1
+            OptionsFrame.Position = UDim2.new(0, 0, 0, 40)
+            OptionsFrame.Size = UDim2.new(1, 0, 0, 0) -- Altura será ajustada
+            
+            local OptionsList = Instance.new("UIListLayout")
+            OptionsList.Parent = OptionsFrame
+            OptionsList.Padding = UDim.new(0, 5)
+            
+            -- Função para atualizar o dropdown
+            local function updateDropdown()
+                if dropdownOpen then
+                    local optionCount = #OptionsFrame:GetChildren() - 1 -- Desconta o UIListLayout
+                    OptionsFrame.Size = UDim2.new(1, 0, 0, optionCount * 35 + (optionCount - 1) * 5)
+                    DropdownFrame.Size = UDim2.new(0.85, 0, 0, 35 + OptionsFrame.Size.Y.Offset)
+                else
+                    OptionsFrame.Size = UDim2.new(1, 0, 0, 0)
+                    DropdownFrame.Size = UDim2.new(0.85, 0, 0, 35)
+                end
+            end
+            
+            -- Função para criar opções
+            local function createOptions()
+                -- Limpa opções existentes
+                for _, child in ipairs(OptionsFrame:GetChildren()) do
+                    if child:IsA("TextButton") then
+                        child:Destroy()
+                    end
+                end
+                
+                -- Cria novas opções
+                for _, option in ipairs(options) do
+                    local OptionButton = Instance.new("TextButton")
+                    OptionButton.Name = option
+                    OptionButton.Parent = OptionsFrame
+                    OptionButton.BackgroundColor3 = theme.ElementColor
+                    OptionButton.Size = UDim2.new(1, 0, 0, 35)
+                    OptionButton.Font = Enum.Font.Gotham
+                    OptionButton.Text = option
+                    OptionButton.TextColor3 = theme.TextColor
+                    OptionButton.TextSize = 14
+                    
+                    local OptionCorner = Instance.new("UICorner")
+                    OptionCorner.CornerRadius = UDim.new(0, 4)
+                    OptionCorner.Parent = OptionButton
+                    
+                    OptionButton.MouseButton1Click:Connect(function()
+                        currentOption = option
+                        MainButton.Text = name..": "..currentOption
+                        dropdownOpen = false
+                        updateDropdown()
+                        if callback then callback(option) end
+                    end)
+                end
+            end
+            
+            -- Criar opções iniciais
+            if options then
+                createOptions()
+            end
+            
+            -- Controle de abertura/fechamento
+            MainButton.MouseButton1Click:Connect(function()
+                dropdownOpen = not dropdownOpen
+                updateDropdown()
+            end)
+            
+            -- Retorna funções para controle externo
+            return {
+                RefreshOptions = function(newOptions)
+                    options = newOptions
+                    createOptions()
+                    updateDropdown()
+                end,
+                SetOption = function(option)
+                    if table.find(options, option) then
+                        currentOption = option
+                        MainButton.Text = name..": "..currentOption
+                        if callback then callback(option) end
+                    end
+                end,
+                GetOption = function()
+                    return currentOption
                 end
             }
         end
