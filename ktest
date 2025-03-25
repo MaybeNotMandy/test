@@ -226,12 +226,8 @@ function SimpleKavo.CreateLib(title, themeName)
         Button.Text = name
         Button.TextColor3 = theme.TextColor
         Button.TextSize = 14
-        Button.Position = UDim2.new(0.5, 100, 0, 0)  -- Ajuste o segundo valor (20) para mover mais ou menos
+        Button.Position = UDim2.new(0.5, 50, 0, 0)  -- Ajuste o segundo valor (20) para mover mais ou menos
         Button.AnchorPoint = Vector2.new(0.5, 0)
-        
-        -- Adicione esta linha para centralizar e mover para a direita:
-        Button.Position = UDim2.new(0.5, 20, 0, 0)  -- Ajuste o segundo valor (20) para mover mais ou menos
-        Button.AnchorPoint = Vector2.new(0.5, 0)  -- Centraliza horizontalmente
         
         local ButtonCorner = Instance.new("UICorner")
         ButtonCorner.CornerRadius = UDim.new(0, 4)
@@ -465,3 +461,4 @@ function SimpleKavo.CreateLib(title, themeName)
 end
 
 return SimpleKavo
+
