@@ -150,7 +150,7 @@ function SimpleKavo.CreateLib(title, themeName)
     Minimize.BackgroundTransparency = 0.5
     Minimize.Size = UDim2.new(0, 40, 0, 40) -- Tamanho fixo
     Minimize.Position = UDim2.new(0.3, -45, 0.3, -50)
-    Minimize.Image = "rbxassetid://3926305904" -- Imagem completa
+    Minimize.Image = "rbxassetid://133706910567742" -- Imagem completa
     Minimize.ImageColor3 = theme.TextColor -- Cor do tema
     Minimize.ImageRectOffset = Vector2.new(124, 4) -- Ícone de minimizar
     Minimize.ImageRectSize = Vector2.new(24, 24)
@@ -489,7 +489,7 @@ function SimpleKavo.CreateLib(title, themeName)
             Arrow.BackgroundTransparency = 1
             Arrow.Size = UDim2.new(0, 20, 0, 20)
             Arrow.Position = UDim2.new(1, -25, 0.5, -10)
-            Arrow.Image = "rbxassetid://3926307971" -- Imagem completa
+            Arrow.Image = "rbxassetid://116140507142780" -- Imagem completa
             Arrow.ImageColor3 = theme.TextColor
             
             local ButtonCorner = Instance.new("UICorner")
