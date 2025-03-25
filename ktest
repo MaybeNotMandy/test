@@ -142,41 +142,39 @@ function SimpleKavo.CreateLib(title, themeName)
         ScreenGui:Destroy()
     end)
     
-local Minimize = Instance.new("ImageButton")
-Minimize.Parent = ScreenGui
-Minimize.Name = "MinimizeButton"
-Minimize.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-Minimize.BackgroundTransparency = 0.5
-Minimize.Size = UDim2.new(0, 40, 0, 40) -- Tamanho fixo
-Minimize.Position = UDim2.new(0.3, -45, 0.3, -50)
-Minimize.Image = "rbxassetid://133706910567742"
-Minimize.ImageColor3 = theme.TextColor -- Adicionei cor consistente com o tema
-
-local MinimizeStroke = Instance.new("UIStroke")
-MinimizeStroke.Color = theme.TextColor
-MinimizeStroke.Thickness 1.5
-MinimizeStroke.Transparency = 0
-MinimizeStroke.Color = Color3.fromRGB(0, 0, 0)
-MinimizeStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-MinimizeStroke.Parent = Minimize
-
-local MinimizeCorner = Instance.new("UICorner")
-MinimizeCorner.CornerRadius = UDim.new(0, 8)
-MinimizeCorner.Parent = Minimize
-
-SimpleKavo:DraggingEnabled(Minimize)
-
-local Minimized = false
-Minimize.MouseButton1Click:Connect(function()
-    Minimized = not Minimized
-    if Minimized then
-        Tween(Main, {Size = UDim2.new(0, 0, 0, 0)})
-        -- Não altera a imagem ou tamanho do botão
-    else
-        Tween(Main, {Size = UDim2.new(0, 500, 0, 350)})
-        -- Não altera a imagem ou tamanho do botão
-    end
-end)
+    local Minimize = Instance.new("ImageButton")
+    Minimize.Parent = ScreenGui
+    Minimize.Name = "MinimizeButton"
+    Minimize.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    Minimize.BackgroundTransparency = 0.5
+    Minimize.Size = UDim2.new(0, 40, 0, 40) -- Tamanho fixo
+    Minimize.Position = UDim2.new(0.3, -45, 0.3, -50)
+    Minimize.Image = "rbxassetid://133706910567742"
+    Minimize.ImageColor3 = theme.TextColor -- Cor consistente com o tema
+    
+    -- Configuração correta do UIStroke
+    local MinimizeStroke = Instance.new("UIStroke")
+    MinimizeStroke.Parent = Minimize
+    MinimizeStroke.Color = Color3.fromRGB(0, 0, 0) -- Preto sólido
+    MinimizeStroke.Thickness = 1.5 -- Espessura da borda (corrigido o erro de sintaxe aqui)
+    MinimizeStroke.Transparency = 0 -- Sem transparência
+    MinimizeStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    
+    local MinimizeCorner = Instance.new("UICorner")
+    MinimizeCorner.CornerRadius = UDim.new(0, 8)
+    MinimizeCorner.Parent = Minimize
+    
+    SimpleKavo:DraggingEnabled(Minimize)
+    
+    local Minimized = false
+    Minimize.MouseButton1Click:Connect(function()
+        Minimized = not Minimized
+        if Minimized then
+            Tween(Main, {Size = UDim2.new(0, 0, 0, 0)})
+        else
+            Tween(Main, {Size = UDim2.new(0, 500, 0, 350)})
+        end
+    end)
     
     SimpleKavo:DraggingEnabled(Header, Main)
     
