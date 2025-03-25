@@ -5,7 +5,7 @@ local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 
--- Temas pré-definidos (ATUALIZADO COM BLOODTHEME)
+-- Temas pré-definidos
 local Themes = {
     DarkTheme = {
         SchemeColor = Color3.fromRGB(64, 64, 64),
@@ -21,12 +21,12 @@ local Themes = {
         TextColor = Color3.fromRGB(0, 0, 0),
         ElementColor = Color3.fromRGB(224, 224, 224)
     },
-    BloodTheme = {  -- NOVO TEMA ADICIONADO
-        SchemeColor = Color3.fromRGB(227, 27, 27),  -- Vermelho sangue
-        Background = Color3.fromRGB(10, 10, 10),    -- Preto quase puro
-        Header = Color3.fromRGB(5, 5, 5),           -- Preto mais escuro
-        TextColor = Color3.fromRGB(255, 255, 255),  -- Texto branco
-        ElementColor = Color3.fromRGB(20, 20, 20)   -- Elementos escuros
+    BloodTheme = {
+        SchemeColor = Color3.fromRGB(227, 27, 27),
+        Background = Color3.fromRGB(10, 10, 10),
+        Header = Color3.fromRGB(5, 5, 5),
+        TextColor = Color3.fromRGB(255, 255, 255),
+        ElementColor = Color3.fromRGB(20, 20, 20)
     },
     Default = {
         SchemeColor = Color3.fromRGB(74, 99, 135),
@@ -36,7 +36,6 @@ local Themes = {
         ElementColor = Color3.fromRGB(32, 32, 38)
     }
 }
-
 
 -- Função para criar tweens
 local function Tween(object, properties, duration)
@@ -143,14 +142,14 @@ function SimpleKavo.CreateLib(title, themeName)
         ScreenGui:Destroy()
     end)
     
-    -- Botão de minimizar (posicionado acima e à esquerda do GUI principal)
+    -- Botão de minimizar
     local Minimize = Instance.new("ImageButton")
     Minimize.Parent = ScreenGui
     Minimize.Name = "MinimizeButton"
     Minimize.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     Minimize.BackgroundTransparency = 0.5
     Minimize.Size = UDim2.new(0, 40, 0, 40)
-    Minimize.Position = UDim2.new(0.3, -45, 0.3, -50)  -- 45px à esquerda e 50px acima do GUI
+    Minimize.Position = UDim2.new(0.3, -45, 0.3, -50)
     Minimize.Image = "rbxassetid://3926305904"
     Minimize.ImageRectOffset = Vector2.new(124, 4)
     Minimize.ImageRectSize = Vector2.new(24, 24)
@@ -159,7 +158,6 @@ function SimpleKavo.CreateLib(title, themeName)
     MinimizeCorner.CornerRadius = UDim.new(0, 8)
     MinimizeCorner.Parent = Minimize
     
-    -- Habilita arrastar para o botão de minimizar
     SimpleKavo:DraggingEnabled(Minimize)
     
     local Minimized = false
@@ -174,20 +172,40 @@ function SimpleKavo.CreateLib(title, themeName)
         end
     end)
     
-    -- Habilita arrastar para o cabeçalho da janela
     SimpleKavo:DraggingEnabled(Header, Main)
     
-    -- Área de abas
+    -- Área de abas COM SCROLL
+    local TabsScroll = Instance.new("ScrollingFrame")
+    TabsScroll.Name = "TabsScroll"
+    TabsScroll.Parent = Main
+    TabsScroll.BackgroundTransparency = 1
+    TabsScroll.Position = UDim2.new(0, 0, 0, 30)
+    TabsScroll.Size = UDim2.new(0, 150, 1, -30)
+    TabsScroll.ScrollBarThickness = 5
+    TabsScroll.ScrollBarImageColor3 = theme.SchemeColor
+    TabsScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    TabsScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+    TabsScroll.ScrollingDirection = Enum.ScrollingDirection.Y
+    TabsScroll.VerticalScrollBarInset = Enum.ScrollBarInset.Always
+
     local TabsHolder = Instance.new("Frame")
     TabsHolder.Name = "TabsHolder"
-    TabsHolder.Parent = Main
-    TabsHolder.BackgroundColor3 = theme.Header
-    TabsHolder.Position = UDim2.new(0, 0, 0, 30)
-    TabsHolder.Size = UDim2.new(0, 150, 1, -30)
-    
+    TabsHolder.Parent = TabsScroll
+    TabsHolder.BackgroundTransparency = 1
+    TabsHolder.Size = UDim2.new(1, 0, 0, 0)
+    TabsHolder.AutomaticSize = Enum.AutomaticSize.Y
+
     local TabsList = Instance.new("UIListLayout")
     TabsList.Parent = TabsHolder
     TabsList.Padding = UDim.new(0, 5)
+    TabsList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        TabsHolder.Size = UDim2.new(1, 0, 0, TabsList.AbsoluteContentSize.Y)
+        if #TabsHolder:GetChildren() > 5 then
+            TabsScroll.CanvasSize = UDim2.new(0, 0, 0, TabsList.AbsoluteContentSize.Y)
+        else
+            TabsScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+        end
+    end)
     
     -- Área de conteúdo
     local Content = Instance.new("Frame")
