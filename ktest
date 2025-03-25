@@ -269,7 +269,7 @@ function SimpleKavo.CreateLib(title, themeName)
             Button.Name = name
             Button.Parent = TabContent
             Button.BackgroundColor3 = theme.ElementColor
-            Button.Size = UDim2.new(0.95, 0, 0, 35)
+            Button.Size = UDim2.new(0.85, 0, 0, 35)
             Button.Font = Enum.Font.Gotham
             Button.Text = name
             Button.TextColor3 = theme.TextColor
