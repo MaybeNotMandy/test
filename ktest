@@ -343,7 +343,7 @@ end)
             ToggleText.Text = name
             ToggleText.TextColor3 = theme.TextColor
             ToggleText.TextSize = 14
-            ToggleText.TextXAlignment = Enum.TextXAlignment.Left
+            ToggleText.TextXAlignment = Enum.TextXAlignment.Center
             
             local State = default or false
             
