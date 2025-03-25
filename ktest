@@ -165,10 +165,10 @@ function SimpleKavo.CreateLib(title, themeName)
         Minimized = not Minimized
         if Minimized then
             Tween(Main, {Size = UDim2.new(0, 0, 0, 0)})
-            Minimize.ImageRectOffset = Vector2.new(84, 4)
+            Minimize.ImageRectOffset = Vector2.new(1, 1)
         else
             Tween(Main, {Size = UDim2.new(0, 500, 0, 350)})
-            Minimize.ImageRectOffset = Vector2.new(124, 4)
+            Minimize.ImageRectOffset = Vector2.new(1, 1)
         end
     end)
     
