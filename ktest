@@ -150,7 +150,7 @@ function SimpleKavo.CreateLib(title, themeName)
     Minimize.BackgroundTransparency = 0.5
     Minimize.Size = UDim2.new(0, 40, 0, 40)
     Minimize.Position = UDim2.new(0.3, -45, 0.3, -50)
-    Minimize.Image = "rbxassetid://3926305904"
+    Minimize.Image = "rbxassetid://133706910567742"
     Minimize.ImageRectOffset = Vector2.new(124, 4)
     Minimize.ImageRectSize = Vector2.new(24, 24)
     
