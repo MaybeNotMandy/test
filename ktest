@@ -488,7 +488,7 @@ end)
             Arrow.BackgroundTransparency = 1
             Arrow.Size = UDim2.new(0, 20, 0, 20)
             Arrow.Position = UDim2.new(1, -25, 0.5, -10)
-            Arrow.Image = "rbxassetid://5279719076"  -- Imagem completa da seta
+            Arrow.Image = "rbxassetid://85893752039651"  -- Imagem completa da seta
             Arrow.ImageColor3 = theme.TextColor
             
             local ButtonCorner = Instance.new("UICorner")
