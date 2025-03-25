@@ -227,7 +227,7 @@ function SimpleKavo.CreateLib(title, themeName)
         TabButton.TextColor3 = theme.TextColor
         TabButton.TextSize = 14
         TabButton.AnchorPoint = Vector2.new(0.5, 0)
-        TabButton.Position = UDim2.new(0.35, -10, 0, 0) -- Posição original dos botões de aba
+        TabButton.Position = UDim2.new(0.35, -10, 0, 0)
         
         local TabCorner = Instance.new("UICorner")
         TabCorner.CornerRadius = UDim.new(0, 4)
@@ -275,8 +275,8 @@ function SimpleKavo.CreateLib(title, themeName)
             Button.TextColor3 = theme.TextColor
             Button.TextSize = 14
             
-            -- Alteração para mover o botão normal para a direita
-            Button.Position = UDim2.new(0.5, 30, 0, 0)  -- Movido 30 pixels para a direita
+            -- Alteração para mover o botão para a direita
+            Button.Position = UDim2.new(0.5, 20, 0, 0)  -- Movido 20 pixels para a direita
             Button.AnchorPoint = Vector2.new(0.5, 0)    -- Centraliza horizontalmente
             
             local ButtonCorner = Instance.new("UICorner")
