@@ -490,9 +490,9 @@ end)
             Arrow.BackgroundTransparency = 1
             Arrow.Size = UDim2.new(0, 20, 0, 20)
             Arrow.Position = UDim2.new(1, -25, 0.5, -10)
-            Arrow.Image = "rbxassetid://3926305904"
-            Arrow.ImageRectOffset = Vector2.new(364, 284)
-            Arrow.ImageRectSize = Vector2.new(24, 24)
+            Arrow.Image = "rbxassetid://116140507142780"
+            Arrow.ImageRectOffset = Vector2.new(1, 1)
+            Arrow.ImageRectSize = Vector2.new(1, 1)
             Arrow.ImageColor3 = theme.TextColor
             
             local ButtonCorner = Instance.new("UICorner")
