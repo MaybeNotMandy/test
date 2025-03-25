@@ -142,17 +142,18 @@ function SimpleKavo.CreateLib(title, themeName)
         ScreenGui:Destroy()
     end)
     
-    -- Botão de minimizar
+    -- BOTÃO DE MINIMIZAR MODIFICADO (IMAGEM COMPLETA)
     local Minimize = Instance.new("ImageButton")
     Minimize.Parent = ScreenGui
     Minimize.Name = "MinimizeButton"
     Minimize.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     Minimize.BackgroundTransparency = 0.5
-    Minimize.Size = UDim2.new(0, 40, 0, 40)
+    Minimize.Size = UDim2.new(0, 40, 0, 40) -- Tamanho fixo
     Minimize.Position = UDim2.new(0.3, -45, 0.3, -50)
-    Minimize.Image = "rbxassetid://133706910567742"
-    Minimize.ImageRectOffset = Vector2.new(1, 1)
-    Minimize.ImageRectSize = Vector2.new(1, 1)
+    Minimize.Image = "rbxassetid://3926305904" -- Imagem completa
+    Minimize.ImageColor3 = theme.TextColor -- Cor do tema
+    Minimize.ImageRectOffset = Vector2.new(124, 4) -- Ícone de minimizar
+    Minimize.ImageRectSize = Vector2.new(24, 24)
     
     local MinimizeCorner = Instance.new("UICorner")
     MinimizeCorner.CornerRadius = UDim.new(0, 8)
@@ -165,10 +166,8 @@ function SimpleKavo.CreateLib(title, themeName)
         Minimized = not Minimized
         if Minimized then
             Tween(Main, {Size = UDim2.new(0, 0, 0, 0)})
-            Minimize.ImageRectOffset = Vector2.new(1, 1)
         else
             Tween(Main, {Size = UDim2.new(0, 500, 0, 350)})
-            Minimize.ImageRectOffset = Vector2.new(1, 1)
         end
     end)
     
@@ -459,7 +458,7 @@ function SimpleKavo.CreateLib(title, themeName)
             }
         end
         
-        -- Função AddDropdown com Tween
+        -- Função AddDropdown com seta completa
         function TabFunctions:AddDropdown(name, options, defaultOption, callback)
             local dropdownOpen = false
             local currentOption = defaultOption or (options and options[1]) or "Selecione"
@@ -483,14 +482,14 @@ function SimpleKavo.CreateLib(title, themeName)
             MainButton.TextColor3 = theme.TextColor
             MainButton.TextSize = 14
             
-            -- Seta indicadora (IMAGEM COMPLETA)
+            -- SETA COMPLETA (MODIFICADO)
             local Arrow = Instance.new("ImageLabel")
             Arrow.Name = "Arrow"
             Arrow.Parent = MainButton
             Arrow.BackgroundTransparency = 1
             Arrow.Size = UDim2.new(0, 20, 0, 20)
             Arrow.Position = UDim2.new(1, -25, 0.5, -10)
-            Arrow.Image = "rbxassetid://3926307971"  -- Imagem completa da seta
+            Arrow.Image = "rbxassetid://3926307971" -- Imagem completa
             Arrow.ImageColor3 = theme.TextColor
             
             local ButtonCorner = Instance.new("UICorner")
@@ -514,7 +513,7 @@ function SimpleKavo.CreateLib(title, themeName)
             local function toggleDropdown()
                 dropdownOpen = not dropdownOpen
                 
-                -- Animação da seta (mantida igual)
+                -- Animação da seta (mantida)
                 Tween(Arrow, {
                     Rotation = dropdownOpen and 180 or 0
                 }, 0.2)
@@ -671,10 +670,8 @@ function SimpleKavo.CreateLib(title, themeName)
             Minimized = not Minimized
             if Minimized then
                 Tween(Main, {Size = UDim2.new(0, 0, 0, 0)})
-                Minimize.ImageRectOffset = Vector2.new(84, 4)
             else
                 Tween(Main, {Size = UDim2.new(0, 500, 0, 350)})
-                Minimize.ImageRectOffset = Vector2.new(124, 4)
             end
         end
     }
