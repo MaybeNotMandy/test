@@ -276,7 +276,7 @@ function SimpleKavo.CreateLib(title, themeName)
             Button.TextSize = 14
             
             -- Alteração para mover o botão normal para a direita
-            Button.Position = UDim2.new(0.5, 30, 0, 0)  -- Movido 30 pixels para a direita
+            Button.Position = UDim2.new(0.5, 100, 0, 0)  -- Movido 30 pixels para a direita
             Button.AnchorPoint = Vector2.new(0.5, 0)    -- Centraliza horizontalmente
             
             local ButtonCorner = Instance.new("UICorner")
