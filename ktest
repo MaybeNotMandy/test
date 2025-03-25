@@ -179,8 +179,8 @@ function SimpleKavo.CreateLib(title, themeName)
     TabsScroll.Name = "TabsScroll"
     TabsScroll.Parent = Main
     TabsScroll.BackgroundTransparency = 1
-    TabsScroll.Position = UDim2.new(0, 10, 0, 30)
-    TabsScroll.Size = UDim2.new(0, 150, 1, -30)
+    TabsScroll.Position = UDim2.new(0, 20, 0, 30)
+    TabsScroll.Size = UDim2.new(0, 140, 1, -30)
     TabsScroll.ScrollBarThickness = 5
     TabsScroll.ScrollBarImageColor3 = theme.SchemeColor
     TabsScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
