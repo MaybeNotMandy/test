@@ -152,6 +152,13 @@ Minimize.Position = UDim2.new(0.3, -45, 0.3, -50)
 Minimize.Image = "rbxassetid://133706910567742"
 Minimize.ImageColor3 = theme.TextColor -- Adicionei cor consistente com o tema
 
+local MinimizeStroke = Instance.new("UIStroke")
+MinimizeStroke.Parent = Minimize
+MinimizeStroke.Color = theme.TextColor
+MinimizeStroke.Thickness = 1
+MinimizeStroke.Transparency = 0.5
+MinimizeStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
 local MinimizeCorner = Instance.new("UICorner")
 MinimizeCorner.CornerRadius = UDim.new(0, 8)
 MinimizeCorner.Parent = Minimize
