@@ -227,7 +227,7 @@ function SimpleKavo.CreateLib(title, themeName)
         TabButton.TextColor3 = theme.TextColor
         TabButton.TextSize = 14
         TabButton.AnchorPoint = Vector2.new(0.5, 0)
-        TabButton.Position = UDim2.new(0.35, -10, 0, 0) -- Posição original dos botões de aba
+        TabButton.Position = UDim2.new(0.35, -10, 0, 0)
         
         local TabCorner = Instance.new("UICorner")
         TabCorner.CornerRadius = UDim.new(0, 4)
@@ -241,10 +241,13 @@ function SimpleKavo.CreateLib(title, themeName)
         TabContent.Visible = false
         TabContent.ScrollBarThickness = 5
         TabContent.ScrollBarImageColor3 = theme.SchemeColor
+        TabContent.CanvasSize = UDim2.new(0, 0, 0, 0)
+        TabContent.AutomaticCanvasSize = Enum.AutomaticSize.Y
         
         local TabContentList = Instance.new("UIListLayout")
         TabContentList.Parent = TabContent
         TabContentList.Padding = UDim.new(0, 5)
+        TabContentList.HorizontalAlignment = Enum.HorizontalAlignment.Center
         
         -- Mostrar/ocultar aba
         TabButton.MouseButton1Click:Connect(function()
@@ -274,10 +277,9 @@ function SimpleKavo.CreateLib(title, themeName)
             Button.Text = name
             Button.TextColor3 = theme.TextColor
             Button.TextSize = 14
-            
-            -- Alteração para mover o botão normal para a direita
-            Button.Position = UDim2.new(1, 800, 0, 0)  -- Movido 30 pixels para a direita
-            Button.AnchorPoint = Vector2.new(0.5, 0)    -- Centraliza horizontalmente
+            -- Removi Position e AnchorPoint fixos para permitir que UIListLayout gerencie a posição
+            -- Adicionei centralização
+            Button.AnchorPoint = Vector2.new(0.5, 0)
             
             local ButtonCorner = Instance.new("UICorner")
             ButtonCorner.CornerRadius = UDim.new(0, 4)
@@ -287,7 +289,16 @@ function SimpleKavo.CreateLib(title, themeName)
                 if callback then callback() end
             end)
             
-            return Button
+            -- Retorna o botão com função para mudar posição
+            return {
+                Button = Button,
+                SetPosition = function(xScale, xOffset, yScale, yOffset)
+                    Button.Position = UDim2.new(xScale, xOffset, yScale, yOffset)
+                end,
+                SetAnchorPoint = function(x, y)
+                    Button.AnchorPoint = Vector2.new(x, y)
+                end
+            }
         end
         
         function TabFunctions:AddToggle(name, default, callback)
