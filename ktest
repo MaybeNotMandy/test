@@ -276,6 +276,15 @@ end)
             Button.TextColor3 = theme.TextColor
             Button.TextSize = 14
             Button.AnchorPoint = Vector2.new(0.5, 0)
+
+            local Click = Instance.new("ImageLabel")
+            Click.Name = "Click"
+            Click.Parent = Button
+            Click.BackgroundTransparency = 1
+            Click.Size = UDim2.new(0, 20, 0, 20)
+            Click.Position = UDim2.new(1, -25, 0.5, -10)
+            Click.Image = "rbxassetid://87390641350856"  -- Imagem completa da seta
+            Click.ImageColor3 = theme.TextColor
             
             local ButtonCorner = Instance.new("UICorner")
             ButtonCorner.CornerRadius = UDim.new(0, 4)
