@@ -45,36 +45,50 @@ local function Tween(object, properties, duration)
     return tween
 end
 
--- Função para habilitar arrastar
+-- Função para habilitar arrastar (modificada para mobile e PC)
 function SimpleKavo:DraggingEnabled(frame, parent)
     parent = parent or frame
     local dragging = false
     local dragInput, mousePos, framePos
 
+    -- Função para iniciar o arrasto
+    local function startDrag(input)
+        dragging = true
+        mousePos = input.Position
+        framePos = parent.Position
+        
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+
+    -- Conexão para ambos tipos de input (mouse e touch)
     frame.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true
-            mousePos = input.Position
-            framePos = parent.Position
-            
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
-                end
-            end)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            startDrag(input)
         end
     end)
 
+    -- Manejar movimento tanto para mouse como touch
     frame.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement then
+        if (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
             dragInput = input
         end
     end)
 
+    -- Atualizar posição durante o arrastre
     UserInputService.InputChanged:Connect(function(input)
-        if input == dragInput and dragging then
+        if (input == dragInput and dragging) and 
+           (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
             local delta = input.Position - mousePos
-            parent.Position = UDim2.new(framePos.X.Scale, framePos.X.Offset + delta.X, framePos.Y.Scale, framePos.Y.Offset + delta.Y)
+            parent.Position = UDim2.new(
+                framePos.X.Scale, 
+                framePos.X.Offset + delta.X,
+                framePos.Y.Scale, 
+                framePos.Y.Offset + delta.Y
+            )
         end
     end)
 end
@@ -648,19 +662,19 @@ function SimpleKavo.CreateLib(title, themeName)
                 end
                 
                 SliderBar.InputBegan:Connect(function(input)
-                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
                         dragging = true
                     end
                 end)
                 
                 SliderBar.InputEnded:Connect(function(input)
-                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
                         dragging = false
                     end
                 end)
                 
                 UserInputService.InputChanged:Connect(function(input)
-                    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+                    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
                         local pos = input.Position.X - SliderBar.AbsolutePosition.X
                         local percent = math.clamp(pos/SliderBar.AbsoluteSize.X, 0, 1)
                         local value = min + (max - min) * percent
