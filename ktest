@@ -313,18 +313,30 @@ function SimpleKavo.CreateLib(title, themeName)
             SectionContent.Size = UDim2.new(1, 0, 0, 0)
             SectionContent.AutomaticSize = Enum.AutomaticSize.Y
             
+            -- Usamos UIListLayout para manter a ordem de criação
             local SectionList = Instance.new("UIListLayout")
             SectionList.Parent = SectionContent
             SectionList.Padding = UDim.new(0, 5)
+            SectionList.SortOrder = Enum.SortOrder.LayoutOrder -- Importante para manter ordem
+            
+            -- Variável para controlar a ordem
+            local layoutOrder = 0
             
             -- Funções da Section
             local SectionFunctions = {}
+            
+            -- Função genérica para adicionar elementos
+            local function addElement(element)
+                layoutOrder = layoutOrder + 1
+                element.LayoutOrder = layoutOrder
+                element.Parent = SectionContent
+                return element
+            end
             
             -- Função para adicionar Button à Section
             function SectionFunctions:NewButton(name, description, callback)
                 local Button = Instance.new("TextButton")
                 Button.Name = name
-                Button.Parent = SectionContent
                 Button.BackgroundColor3 = theme.ElementColor
                 Button.Size = UDim2.new(1, 0, 0, 35)
                 Button.Font = Enum.Font.Gotham
@@ -372,14 +384,13 @@ function SimpleKavo.CreateLib(title, themeName)
                     if callback then callback() end
                 end)
                 
-                return Button
+                return addElement(Button)
             end
             
             -- Função para adicionar Toggle à Section
             function SectionFunctions:NewToggle(name, default, callback)
                 local ToggleFrame = Instance.new("Frame")
                 ToggleFrame.Name = name.."_Toggle"
-                ToggleFrame.Parent = SectionContent
                 ToggleFrame.BackgroundTransparency = 1
                 ToggleFrame.Size = UDim2.new(1, 0, 0, 35)
                 
@@ -430,7 +441,7 @@ function SimpleKavo.CreateLib(title, themeName)
                     if callback then callback(State) end
                 end)
                 
-                return ToggleFrame
+                return addElement(ToggleFrame)
             end
             
             -- Função para adicionar Dropdown à Section
@@ -440,7 +451,6 @@ function SimpleKavo.CreateLib(title, themeName)
                 
                 local DropdownFrame = Instance.new("Frame")
                 DropdownFrame.Name = name.."_Dropdown"
-                DropdownFrame.Parent = SectionContent
                 DropdownFrame.BackgroundTransparency = 1
                 DropdownFrame.Size = UDim2.new(1, 0, 0, 35)
                 DropdownFrame.ClipsDescendants = true
@@ -586,14 +596,13 @@ function SimpleKavo.CreateLib(title, themeName)
                 
                 UserInputService.InputBegan:Connect(onInputBegan)
                 
-                return DropdownFrame
+                return addElement(DropdownFrame)
             end
             
             -- Função para adicionar Slider à Section
             function SectionFunctions:NewSlider(name, min, max, default, callback)
                 local SliderFrame = Instance.new("Frame")
                 SliderFrame.Name = name.."_Slider"
-                SliderFrame.Parent = SectionContent
                 SliderFrame.BackgroundTransparency = 1
                 SliderFrame.Size = UDim2.new(1, 0, 0, 50)
                 
@@ -659,7 +668,7 @@ function SimpleKavo.CreateLib(title, themeName)
                     end
                 end)
                 
-                return SliderFrame
+                return addElement(SliderFrame)
             end
             
             return SectionFunctions
