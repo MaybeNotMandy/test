@@ -191,12 +191,12 @@ function SimpleKavo.CreateLib(title, themeName)
     
     SimpleKavo:DraggingEnabled(Header, Main)
     
-    -- Área de abas
+    -- Área de abas (ajustada para posição mais à direita)
     local TabsScroll = Instance.new("ScrollingFrame")
     TabsScroll.Name = "TabsScroll"
     TabsScroll.Parent = Main
     TabsScroll.BackgroundTransparency = 1
-    TabsScroll.Position = UDim2.new(0, 20, 0, 30)
+    TabsScroll.Position = UDim2.new(0, 30, 0, 30) -- Movido 10 pixels para direita (era 20)
     TabsScroll.Size = UDim2.new(0, 140, 1, -30)
     TabsScroll.ScrollBarThickness = 5
     TabsScroll.ScrollBarImageColor3 = theme.SchemeColor
@@ -212,18 +212,18 @@ function SimpleKavo.CreateLib(title, themeName)
     TabsHolder.Size = UDim2.new(1, 0, 0, 0)
     TabsHolder.AutomaticSize = Enum.AutomaticSize.Y
 
-    -- Variável para controlar a posição Y dos botões de aba
+    -- Variáveis para controle de posição dos botões de aba
     local nextTabPositionY = 0
     local tabSpacing = 5
     local tabHeight = 30
     
-    -- Área de conteúdo
+    -- Área de conteúdo (ajustada para compensar movimento das abas)
     local Content = Instance.new("Frame")
     Content.Name = "Content"
     Content.Parent = Main
     Content.BackgroundTransparency = 1
-    Content.Position = UDim2.new(0, 150, 0, 30)
-    Content.Size = UDim2.new(1, -150, 1, -30)
+    Content.Position = UDim2.new(0, 160, 0, 30) -- Ajustado para 160 (era 150)
+    Content.Size = UDim2.new(1, -160, 1, -30)  -- Ajustado para -160
     
     -- Função para adicionar aba
     function SimpleKavo:AddTab(name)
@@ -237,7 +237,7 @@ function SimpleKavo.CreateLib(title, themeName)
         TabButton.TextColor3 = theme.TextColor
         TabButton.TextSize = 14
         TabButton.AnchorPoint = Vector2.new(0.5, 0)
-        TabButton.Position = UDim2.new(0.35, -10, 0, nextTabPositionY)
+        TabButton.Position = UDim2.new(0.45, 0, 0, nextTabPositionY) -- Ajustado para 0.45 (era 0.35)
         
         -- Atualiza a posição para o próximo botão
         nextTabPositionY = nextTabPositionY + tabHeight + tabSpacing
@@ -327,7 +327,7 @@ function SimpleKavo.CreateLib(title, themeName)
             local SectionList = Instance.new("UIListLayout")
             SectionList.Parent = SectionContent
             SectionList.Padding = UDim.new(0, 5)
-            SectionList.SortOrder = Enum.SortOrder.LayoutOrder -- Importante para manter ordem
+            SectionList.SortOrder = Enum.SortOrder.LayoutOrder
             
             -- Variável para controlar a ordem
             local layoutOrder = 0
