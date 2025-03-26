@@ -372,17 +372,7 @@ function SimpleKavo.CreateLib(title, themeName)
                     if callback then callback() end
                 end)
                 
-                return {
-                    Button = Button,
-                    SetText = function(newText)
-                        Button.Text = newText
-                    end,
-                    SetDescription = function(newDesc)
-                        if description then
-                            Button.Description.Text = newDesc
-                        end
-                    end
-                }
+                return Button
             end
             
             -- Função para adicionar Toggle à Section
@@ -440,15 +430,7 @@ function SimpleKavo.CreateLib(title, themeName)
                     if callback then callback(State) end
                 end)
                 
-                return {
-                    Set = function(value)
-                        State = value
-                        UpdateToggle()
-                    end,
-                    Get = function()
-                        return State
-                    end
-                }
+                return ToggleFrame
             end
             
             -- Função para adicionar Dropdown à Section
@@ -604,29 +586,7 @@ function SimpleKavo.CreateLib(title, themeName)
                 
                 UserInputService.InputBegan:Connect(onInputBegan)
                 
-                return {
-                    RefreshOptions = function(newOptions)
-                        options = newOptions
-                        createOptions()
-                        if dropdownOpen then
-                            toggleDropdown()
-                            toggleDropdown()
-                        end
-                    end,
-                    SetOption = function(option)
-                        if table.find(options, option) then
-                            currentOption = option
-                            MainButton.Text = name..": "..currentOption
-                            if callback then callback(option) end
-                        end
-                    end,
-                    GetOption = function()
-                        return currentOption
-                    end,
-                    IsOpen = function()
-                        return dropdownOpen
-                    end
-                }
+                return DropdownFrame
             end
             
             -- Função para adicionar Slider à Section
@@ -699,14 +659,7 @@ function SimpleKavo.CreateLib(title, themeName)
                     end
                 end)
                 
-                return {
-                    Set = function(value)
-                        UpdateSlider(math.clamp(value, min, max))
-                    end,
-                    Get = function()
-                        return tonumber(string.match(SliderText.Text, "%d+"))
-                    end
-                }
+                return SliderFrame
             end
             
             return SectionFunctions
