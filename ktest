@@ -28,7 +28,7 @@ local Themes = {
         TextColor = Color3.fromRGB(255, 255, 255),
         ElementColor = Color3.fromRGB(20, 20, 20)
     },
-    Default = {
+    DefaultTheme = {
         SchemeColor = Color3.fromRGB(74, 99, 135),
         Background = Color3.fromRGB(36, 37, 43),
         Header = Color3.fromRGB(28, 29, 34),
@@ -45,28 +45,15 @@ local function Tween(object, properties, duration)
     return tween
 end
 
--- Função para habilitar arrastar (modificada para mobile)
+-- Função para habilitar arrastar
 function SimpleKavo:DraggingEnabled(frame, parent)
     parent = parent or frame
     local dragging = false
     local dragInput, mousePos, framePos
-    local dragStartTime = 0
-
-    local function updatePosition(input)
-        local delta = input.Position - mousePos
-        parent.Position = UDim2.new(
-            framePos.X.Scale, 
-            framePos.X.Offset + delta.X,
-            framePos.Y.Scale, 
-            framePos.Y.Offset + delta.Y
-        )
-    end
 
     frame.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or 
-           input.UserInputType == Enum.UserInputType.Touch then
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
             dragging = true
-            dragStartTime = os.clock()
             mousePos = input.Position
             framePos = parent.Position
             
@@ -79,24 +66,23 @@ function SimpleKavo:DraggingEnabled(frame, parent)
     end)
 
     frame.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement or 
-           input.UserInputType == Enum.UserInputType.Touch then
+        if input.UserInputType == Enum.UserInputType.MouseMovement then
             dragInput = input
         end
     end)
 
     UserInputService.InputChanged:Connect(function(input)
-        if (input == dragInput and dragging) and 
-           (os.clock() - dragStartTime > 0.02) then -- Pequeno delay para evitar toques acidentais
-            updatePosition(input)
+        if input == dragInput and dragging then
+            local delta = input.Position - mousePos
+            parent.Position = UDim2.new(framePos.X.Scale, framePos.X.Offset + delta.X, framePos.Y.Scale, framePos.Y.Offset + delta.Y)
         end
     end)
 end
 
--- Função principal
+-- Função principal para criar a Window
 function SimpleKavo.CreateLib(title, themeName)
     -- Seleciona o tema
-    local theme = Themes[themeName] or Themes.Default
+    local theme = Themes[themeName] or Themes.DefaultTheme
     
     -- Cria a ScreenGui
     local ScreenGui = Instance.new("ScreenGui")
@@ -156,7 +142,6 @@ function SimpleKavo.CreateLib(title, themeName)
         ScreenGui:Destroy()
     end)
     
-    -- Botão de minimizar (modificado para mobile)
     local Minimize = Instance.new("ImageButton")
     Minimize.Parent = ScreenGui
     Minimize.Name = "MinimizeButton"
@@ -192,7 +177,7 @@ function SimpleKavo.CreateLib(title, themeName)
     
     SimpleKavo:DraggingEnabled(Header, Main)
     
-    -- Área de abas COM SCROLL
+    -- Área de abas
     local TabsScroll = Instance.new("ScrollingFrame")
     TabsScroll.Name = "TabsScroll"
     TabsScroll.Parent = Main
@@ -233,13 +218,6 @@ function SimpleKavo.CreateLib(title, themeName)
     Content.Position = UDim2.new(0, 150, 0, 30)
     Content.Size = UDim2.new(1, -150, 1, -30)
     
-    -- Modificação na UIListLayout da TabContent para manter ordem
-    local TabContentList = Instance.new("UIListLayout")
-    TabContentList.Parent = Content
-    TabContentList.Padding = UDim.new(0, 5)
-    TabContentList.HorizontalAlignment = Enum.HorizontalAlignment.Center
-    TabContentList.SortOrder = Enum.SortOrder.LayoutOrder
-    
     -- Função para adicionar aba
     function SimpleKavo:AddTab(name)
         local TabButton = Instance.new("TextButton")
@@ -271,9 +249,8 @@ function SimpleKavo.CreateLib(title, themeName)
         
         local TabContentList = Instance.new("UIListLayout")
         TabContentList.Parent = TabContent
-        TabContentList.Padding = UDim.new(0, 5)
+        TabContentList.Padding = UDim.new(0, 10)
         TabContentList.HorizontalAlignment = Enum.HorizontalAlignment.Center
-        TabContentList.SortOrder = Enum.SortOrder.LayoutOrder
         
         -- Mostrar/ocultar aba
         TabButton.MouseButton1Click:Connect(function()
@@ -290,411 +267,449 @@ function SimpleKavo.CreateLib(title, themeName)
             TabContent.Visible = true
         end
         
-        -- Funções da aba
+        -- Funções da Tab
         local TabFunctions = {}
-        local elementOrder = 0
         
-        function TabFunctions:AddButton(name, callback)
-            elementOrder = elementOrder + 1
+        -- Função para criar seções dentro da Tab
+        function TabFunctions:NewSection(name)
+            local SectionFrame = Instance.new("Frame")
+            SectionFrame.Name = name.."_Section"
+            SectionFrame.Parent = TabContent
+            SectionFrame.BackgroundTransparency = 1
+            SectionFrame.Size = UDim2.new(0.9, 0, 0, 0)
+            SectionFrame.AutomaticSize = Enum.AutomaticSize.Y
             
-            local Button = Instance.new("TextButton")
-            Button.Name = name
-            Button.Parent = TabContent
-            Button.BackgroundColor3 = theme.ElementColor
-            Button.Size = UDim2.new(0.85, 0, 0, 35)
-            Button.Font = Enum.Font.Gotham
-            Button.Text = name
-            Button.TextColor3 = theme.TextColor
-            Button.TextSize = 14
-            Button.AnchorPoint = Vector2.new(0.5, 0)
-            Button.LayoutOrder = elementOrder
+            local SectionHeader = Instance.new("Frame")
+            SectionHeader.Name = "Header"
+            SectionHeader.Parent = SectionFrame
+            SectionHeader.BackgroundTransparency = 1
+            SectionHeader.Size = UDim2.new(1, 0, 0, 30)
             
-            local Click = Instance.new("ImageLabel")
-            Click.Name = "Click"
-            Click.Parent = Button
-            Click.BackgroundTransparency = 1
-            Click.Size = UDim2.new(0, 20, 0, 20)
-            Click.Position = UDim2.new(1, -25, 0.5, -10)
-            Click.Image = "rbxassetid://87390641350856"
-            Click.ImageColor3 = theme.TextColor
+            local SectionLabel = Instance.new("TextLabel")
+            SectionLabel.Name = "Label"
+            SectionLabel.Parent = SectionHeader
+            SectionLabel.BackgroundTransparency = 1
+            SectionLabel.Size = UDim2.new(1, 0, 1, 0)
+            SectionLabel.Font = Enum.Font.GothamSemibold
+            SectionLabel.Text = name
+            SectionLabel.TextColor3 = theme.TextColor
+            SectionLabel.TextSize = 14
+            SectionLabel.TextXAlignment = Enum.TextXAlignment.Left
             
-            local ButtonCorner = Instance.new("UICorner")
-            ButtonCorner.CornerRadius = UDim.new(0, 4)
-            ButtonCorner.Parent = Button
+            local SectionLine = Instance.new("Frame")
+            SectionLine.Name = "Line"
+            SectionLine.Parent = SectionHeader
+            SectionLine.BackgroundColor3 = theme.SchemeColor
+            SectionLine.BorderSizePixel = 0
+            SectionLine.Position = UDim2.new(0, 0, 1, -2)
+            SectionLine.Size = UDim2.new(1, 0, 0, 1)
             
-            -- Efeito hover
-            Button.MouseEnter:Connect(function()
-                Tween(Button, {
-                    BackgroundColor3 = Color3.fromRGB(
-                        math.floor(theme.ElementColor.R * 255 + 20),
-                        math.floor(theme.ElementColor.G * 255 + 20),
-                        math.floor(theme.ElementColor.B * 255 + 20)
-                    )
-                }, 0.1)
-            end)
+            -- Container para os elementos da seção
+            local SectionContent = Instance.new("Frame")
+            SectionContent.Name = "Content"
+            SectionContent.Parent = SectionFrame
+            SectionContent.BackgroundTransparency = 1
+            SectionContent.Position = UDim2.new(0, 0, 0, 35)
+            SectionContent.Size = UDim2.new(1, 0, 0, 0)
+            SectionContent.AutomaticSize = Enum.AutomaticSize.Y
             
-            Button.MouseLeave:Connect(function()
-                Tween(Button, {
-                    BackgroundColor3 = theme.ElementColor
-                }, 0.1)
-            end)
+            local SectionList = Instance.new("UIListLayout")
+            SectionList.Parent = SectionContent
+            SectionList.Padding = UDim.new(0, 5)
             
-            Button.MouseButton1Click:Connect(function()
-                if callback then callback() end
-            end)
+            -- Funções da Section
+            local SectionFunctions = {}
             
-            return {
-                Button = Button,
-                SetPosition = function(xScale, xOffset, yScale, yOffset)
-                    Button.Position = UDim2.new(xScale, xOffset, yScale, yOffset)
-                end,
-                SetAnchorPoint = function(x, y)
-                    Button.AnchorPoint = Vector2.new(x, y)
+            -- Função para adicionar Button à Section
+            function SectionFunctions:NewButton(name, description, callback)
+                local Button = Instance.new("TextButton")
+                Button.Name = name
+                Button.Parent = SectionContent
+                Button.BackgroundColor3 = theme.ElementColor
+                Button.Size = UDim2.new(1, 0, 0, 35)
+                Button.Font = Enum.Font.Gotham
+                Button.Text = name
+                Button.TextColor3 = theme.TextColor
+                Button.TextSize = 14
+                Button.AutoButtonColor = false
+                
+                if description then
+                    local DescLabel = Instance.new("TextLabel")
+                    DescLabel.Name = "Description"
+                    DescLabel.Parent = Button
+                    DescLabel.BackgroundTransparency = 1
+                    DescLabel.Position = UDim2.new(0, 10, 1, -15)
+                    DescLabel.Size = UDim2.new(1, -20, 0, 12)
+                    DescLabel.Font = Enum.Font.Gotham
+                    DescLabel.Text = description
+                    DescLabel.TextColor3 = theme.TextColor
+                    DescLabel.TextSize = 10
+                    DescLabel.TextXAlignment = Enum.TextXAlignment.Left
                 end
-            }
-        end
-        
-        function TabFunctions:AddToggle(name, default, callback)
-            elementOrder = elementOrder + 1
-            
-            local ToggleFrame = Instance.new("Frame")
-            ToggleFrame.Name = name.."_Toggle"
-            ToggleFrame.Parent = TabContent
-            ToggleFrame.BackgroundTransparency = 1
-            ToggleFrame.Size = UDim2.new(0.95, 0, 0, 35)
-            ToggleFrame.LayoutOrder = elementOrder
-            
-            local ToggleButton = Instance.new("TextButton")
-            ToggleButton.Name = "Button"
-            ToggleButton.Parent = ToggleFrame
-            ToggleButton.BackgroundColor3 = theme.ElementColor
-            ToggleButton.Size = UDim2.new(0.2, 0, 0.8, 0)
-            ToggleButton.Position = UDim2.new(0.75, 0, 0.1, 0)
-            ToggleButton.Font = Enum.Font.Gotham
-            ToggleButton.Text = ""
-            ToggleButton.TextColor3 = theme.TextColor
-            ToggleButton.TextSize = 14
-            
-            local ToggleCorner = Instance.new("UICorner")
-            ToggleCorner.Parent = ToggleButton
-            
-            local ToggleText = Instance.new("TextLabel")
-            ToggleText.Name = "Text"
-            ToggleText.Parent = ToggleFrame
-            ToggleText.BackgroundTransparency = 1
-            ToggleText.Size = UDim2.new(0.7, 0, 1, 0)
-            ToggleText.Font = Enum.Font.Gotham
-            ToggleText.Text = name
-            ToggleText.TextColor3 = theme.TextColor
-            ToggleText.TextSize = 14
-            ToggleText.TextXAlignment = Enum.TextXAlignment.Center
-            
-            local State = default or false
-            
-            local function UpdateToggle()
-                if State then
-                    Tween(ToggleButton, {
-                        BackgroundColor3 = theme.SchemeColor
-                    }, 0.2)
-                else
-                    Tween(ToggleButton, {
+                
+                local ButtonCorner = Instance.new("UICorner")
+                ButtonCorner.CornerRadius = UDim.new(0, 4)
+                ButtonCorner.Parent = Button
+                
+                -- Efeito hover
+                Button.MouseEnter:Connect(function()
+                    Tween(Button, {
+                        BackgroundColor3 = Color3.fromRGB(
+                            math.floor(theme.ElementColor.R * 255 + 20),
+                            math.floor(theme.ElementColor.G * 255 + 20),
+                            math.floor(theme.ElementColor.B * 255 + 20)
+                        )
+                    }, 0.1)
+                end)
+                
+                Button.MouseLeave:Connect(function()
+                    Tween(Button, {
                         BackgroundColor3 = theme.ElementColor
-                    }, 0.2)
-                end
-            end
-            
-            UpdateToggle()
-            
-            ToggleButton.MouseButton1Click:Connect(function()
-                State = not State
-                UpdateToggle()
-                if callback then callback(State) end
-            end)
-            
-            return {
-                Set = function(value)
-                    State = value
-                    UpdateToggle()
-                end,
-                Get = function()
-                    return State
-                end
-            }
-        end
-        
-        function TabFunctions:AddSlider(name, min, max, default, callback)
-            elementOrder = elementOrder + 1
-            
-            local SliderFrame = Instance.new("Frame")
-            SliderFrame.Name = name.."_Slider"
-            SliderFrame.Parent = TabContent
-            SliderFrame.BackgroundTransparency = 1
-            SliderFrame.Size = UDim2.new(0.95, 0, 0, 50)
-            SliderFrame.LayoutOrder = elementOrder
-            
-            local SliderText = Instance.new("TextLabel")
-            SliderText.Name = "Text"
-            SliderText.Parent = SliderFrame
-            SliderText.BackgroundTransparency = 1
-            SliderText.Size = UDim2.new(1, 0, 0.4, 0)
-            SliderText.Font = Enum.Font.Gotham
-            SliderText.Text = name..": "..default
-            SliderText.TextColor3 = theme.TextColor
-            SliderText.TextSize = 14
-            SliderText.TextXAlignment = Enum.TextXAlignment.Left
-            
-            local SliderBar = Instance.new("Frame")
-            SliderBar.Name = "Bar"
-            SliderBar.Parent = SliderFrame
-            SliderBar.BackgroundColor3 = theme.ElementColor
-            SliderBar.Size = UDim2.new(1, 0, 0.2, 0)
-            SliderBar.Position = UDim2.new(0, 0, 0.6, 0)
-            
-            local SliderCorner = Instance.new("UICorner")
-            SliderCorner.Parent = SliderBar
-            
-            local SliderFill = Instance.new("Frame")
-            SliderFill.Name = "Fill"
-            SliderFill.Parent = SliderBar
-            SliderFill.BackgroundColor3 = theme.SchemeColor
-            SliderFill.Size = UDim2.new((default - min)/(max - min), 0, 1, 0)
-            
-            local SliderFillCorner = Instance.new("UICorner")
-            SliderFillCorner.Parent = SliderFill
-            
-            local dragging = false
-            
-            local function UpdateSlider(value)
-                local percent = math.clamp((value - min)/(max - min), 0, 1)
-                Tween(SliderFill, {
-                    Size = UDim2.new(percent, 0, 1, 0)
-                }, 0.1)
-                SliderText.Text = name..": "..math.floor(value)
-                if callback then callback(value) end
-            end
-            
-            SliderBar.InputBegan:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 or
-                   input.UserInputType == Enum.UserInputType.Touch then
-                    dragging = true
-                end
-            end)
-            
-            SliderBar.InputEnded:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 or
-                   input.UserInputType == Enum.UserInputType.Touch then
-                    dragging = false
-                end
-            end)
-            
-            UserInputService.InputChanged:Connect(function(input)
-                if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or
-                                input.UserInputType == Enum.UserInputType.Touch) then
-                    local pos = input.Position.X - SliderBar.AbsolutePosition.X
-                    local percent = math.clamp(pos/SliderBar.AbsoluteSize.X, 0, 1)
-                    local value = min + (max - min) * percent
-                    UpdateSlider(value)
-                end
-            end)
-            
-            return {
-                Set = function(value)
-                    UpdateSlider(math.clamp(value, min, max))
-                end,
-                Get = function()
-                    return tonumber(string.match(SliderText.Text, "%d+"))
-                end
-            }
-        end
-        
-        function TabFunctions:AddDropdown(name, options, defaultOption, callback)
-            elementOrder = elementOrder + 1
-            
-            local dropdownOpen = false
-            local currentOption = defaultOption or (options and options[1]) or "Selecione"
-            
-            -- Frame principal do dropdown
-            local DropdownFrame = Instance.new("Frame")
-            DropdownFrame.Name = name.."_Dropdown"
-            DropdownFrame.Parent = TabContent
-            DropdownFrame.BackgroundTransparency = 1
-            DropdownFrame.Size = UDim2.new(0.85, 0, 0, 35)
-            DropdownFrame.ClipsDescendants = true
-            DropdownFrame.LayoutOrder = elementOrder
-            
-            -- Botão principal
-            local MainButton = Instance.new("TextButton")
-            MainButton.Name = "MainButton"
-            MainButton.Parent = DropdownFrame
-            MainButton.BackgroundColor3 = theme.ElementColor
-            MainButton.Size = UDim2.new(1, 0, 0, 35)
-            MainButton.Font = Enum.Font.Gotham
-            MainButton.Text = name..": "..currentOption
-            MainButton.TextColor3 = theme.TextColor
-            MainButton.TextSize = 14
-            
-            -- Seta indicadora
-            local Arrow = Instance.new("ImageLabel")
-            Arrow.Name = "Arrow"
-            Arrow.Parent = MainButton
-            Arrow.BackgroundTransparency = 1
-            Arrow.Size = UDim2.new(0, 20, 0, 20)
-            Arrow.Position = UDim2.new(1, -25, 0.5, -10)
-            Arrow.Image = "rbxassetid://85893752039651"
-            Arrow.ImageColor3 = theme.TextColor
-            
-            local ButtonCorner = Instance.new("UICorner")
-            ButtonCorner.CornerRadius = UDim.new(0, 4)
-            ButtonCorner.Parent = MainButton
-            
-            -- Container para as opções
-            local OptionsFrame = Instance.new("Frame")
-            OptionsFrame.Name = "OptionsFrame"
-            OptionsFrame.Parent = DropdownFrame
-            OptionsFrame.BackgroundTransparency = 1
-            OptionsFrame.Position = UDim2.new(0, 0, 0, 40)
-            OptionsFrame.Size = UDim2.new(1, 0, 0, 0)
-            OptionsFrame.Visible = false
-            
-            local OptionsList = Instance.new("UIListLayout")
-            OptionsList.Parent = OptionsFrame
-            OptionsList.Padding = UDim.new(0, 5)
-            
-            -- Função para animar o dropdown
-            local function toggleDropdown()
-                dropdownOpen = not dropdownOpen
+                    }, 0.1)
+                end)
                 
-                Tween(Arrow, {
-                    Rotation = dropdownOpen and 180 or 0
-                }, 0.2)
+                Button.MouseButton1Click:Connect(function()
+                    if callback then callback() end
+                end)
                 
-                if dropdownOpen then
-                    local optionCount = #OptionsFrame:GetChildren() - 1
-                    local totalHeight = optionCount * 35 + (optionCount - 1) * 5
-                    
-                    OptionsFrame.Visible = true
-                    Tween(OptionsFrame, {
-                        Size = UDim2.new(1, 0, 0, totalHeight)
-                    }, 0.2)
-                    
-                    Tween(DropdownFrame, {
-                        Size = UDim2.new(0.85, 0, 0, 35 + totalHeight)
-                    }, 0.2)
-                else
-                    Tween(OptionsFrame, {
-                        Size = UDim2.new(1, 0, 0, 0)
-                    }, 0.2)
-                    
-                    Tween(DropdownFrame, {
-                        Size = UDim2.new(0.85, 0, 0, 35)
-                    }, 0.2)
-                    
-                    delay(0.2, function()
-                        OptionsFrame.Visible = false
-                    end)
-                end
-            end
-            
-            -- Função para criar opções
-            local function createOptions()
-                for _, child in ipairs(OptionsFrame:GetChildren()) do
-                    if child:IsA("TextButton") then
-                        child:Destroy()
+                return {
+                    Button = Button,
+                    SetText = function(newText)
+                        Button.Text = newText
+                    end,
+                    SetDescription = function(newDesc)
+                        if description then
+                            Button.Description.Text = newDesc
+                        end
                     end
-                end
+                }
+            end
+            
+            -- Função para adicionar Toggle à Section
+            function SectionFunctions:NewToggle(name, default, callback)
+                local ToggleFrame = Instance.new("Frame")
+                ToggleFrame.Name = name.."_Toggle"
+                ToggleFrame.Parent = SectionContent
+                ToggleFrame.BackgroundTransparency = 1
+                ToggleFrame.Size = UDim2.new(1, 0, 0, 35)
                 
-                for i, option in ipairs(options) do
-                    local OptionButton = Instance.new("TextButton")
-                    OptionButton.Name = option
-                    OptionButton.Parent = OptionsFrame
-                    OptionButton.BackgroundColor3 = theme.ElementColor
-                    OptionButton.Size = UDim2.new(1, 0, 0, 35)
-                    OptionButton.Font = Enum.Font.Gotham
-                    OptionButton.Text = option
-                    OptionButton.TextColor3 = theme.TextColor
-                    OptionButton.TextSize = 14
-                    OptionButton.AutoButtonColor = false
-                    
-                    local OptionCorner = Instance.new("UICorner")
-                    OptionCorner.CornerRadius = UDim.new(0, 4)
-                    OptionCorner.Parent = OptionButton
-                    
-                    OptionButton.MouseEnter:Connect(function()
-                        Tween(OptionButton, {
-                            BackgroundColor3 = Color3.fromRGB(
-                                math.floor(theme.ElementColor.R * 255 + 20),
-                                math.floor(theme.ElementColor.G * 255 + 20),
-                                math.floor(theme.ElementColor.B * 255 + 20)
-                            )
-                        }, 0.1)
-                    end)
-                    
-                    OptionButton.MouseLeave:Connect(function()
-                        Tween(OptionButton, {
+                local ToggleButton = Instance.new("TextButton")
+                ToggleButton.Name = "Button"
+                ToggleButton.Parent = ToggleFrame
+                ToggleButton.BackgroundColor3 = theme.ElementColor
+                ToggleButton.Size = UDim2.new(0.2, 0, 0.8, 0)
+                ToggleButton.Position = UDim2.new(0.75, 0, 0.1, 0)
+                ToggleButton.Font = Enum.Font.Gotham
+                ToggleButton.Text = ""
+                ToggleButton.TextColor3 = theme.TextColor
+                ToggleButton.TextSize = 14
+                
+                local ToggleCorner = Instance.new("UICorner")
+                ToggleCorner.Parent = ToggleButton
+                
+                local ToggleText = Instance.new("TextLabel")
+                ToggleText.Name = "Text"
+                ToggleText.Parent = ToggleFrame
+                ToggleText.BackgroundTransparency = 1
+                ToggleText.Size = UDim2.new(0.7, 0, 1, 0)
+                ToggleText.Font = Enum.Font.Gotham
+                ToggleText.Text = name
+                ToggleText.TextColor3 = theme.TextColor
+                ToggleText.TextSize = 14
+                ToggleText.TextXAlignment = Enum.TextXAlignment.Left
+                
+                local State = default or false
+                
+                local function UpdateToggle()
+                    if State then
+                        Tween(ToggleButton, {
+                            BackgroundColor3 = theme.SchemeColor
+                        }, 0.2)
+                    else
+                        Tween(ToggleButton, {
                             BackgroundColor3 = theme.ElementColor
-                        }, 0.1)
-                    end)
-                    
-                    OptionButton.MouseButton1Click:Connect(function()
-                        currentOption = option
-                        MainButton.Text = name..": "..currentOption
-                        toggleDropdown()
-                        if callback then callback(option) end
-                    end)
-                end
-            end
-            
-            -- Criar opções iniciais
-            if options then
-                createOptions()
-            end
-            
-            -- Controle de abertura/fechamento
-            MainButton.MouseButton1Click:Connect(function()
-                toggleDropdown()
-            end)
-            
-            -- Fechar dropdown ao clicar fora
-            local function onInputBegan(input)
-                if (input.UserInputType == Enum.UserInputType.MouseButton1 or
-                    input.UserInputType == Enum.UserInputType.Touch) and dropdownOpen then
-                    local absolutePosition = DropdownFrame.AbsolutePosition
-                    local absoluteSize = DropdownFrame.AbsoluteSize
-                    
-                    if not (input.Position.X >= absolutePosition.X and 
-                           input.Position.X <= absolutePosition.X + absoluteSize.X and
-                           input.Position.Y >= absolutePosition.Y and 
-                           input.Position.Y <= absolutePosition.Y + absoluteSize.Y) then
-                        toggleDropdown()
+                        }, 0.2)
                     end
                 end
+                
+                UpdateToggle()
+                
+                ToggleButton.MouseButton1Click:Connect(function()
+                    State = not State
+                    UpdateToggle()
+                    if callback then callback(State) end
+                end)
+                
+                return {
+                    Set = function(value)
+                        State = value
+                        UpdateToggle()
+                    end,
+                    Get = function()
+                        return State
+                    end
+                }
             end
             
-            UserInputService.InputBegan:Connect(onInputBegan)
-            
-            return {
-                RefreshOptions = function(newOptions)
-                    options = newOptions
-                    createOptions()
+            -- Função para adicionar Dropdown à Section
+            function SectionFunctions:NewDropdown(name, options, defaultOption, callback)
+                local dropdownOpen = false
+                local currentOption = defaultOption or (options and options[1]) or "Selecione"
+                
+                local DropdownFrame = Instance.new("Frame")
+                DropdownFrame.Name = name.."_Dropdown"
+                DropdownFrame.Parent = SectionContent
+                DropdownFrame.BackgroundTransparency = 1
+                DropdownFrame.Size = UDim2.new(1, 0, 0, 35)
+                DropdownFrame.ClipsDescendants = true
+                
+                local MainButton = Instance.new("TextButton")
+                MainButton.Name = "MainButton"
+                MainButton.Parent = DropdownFrame
+                MainButton.BackgroundColor3 = theme.ElementColor
+                MainButton.Size = UDim2.new(1, 0, 0, 35)
+                MainButton.Font = Enum.Font.Gotham
+                MainButton.Text = name..": "..currentOption
+                MainButton.TextColor3 = theme.TextColor
+                MainButton.TextSize = 14
+                
+                local Arrow = Instance.new("ImageLabel")
+                Arrow.Name = "Arrow"
+                Arrow.Parent = MainButton
+                Arrow.BackgroundTransparency = 1
+                Arrow.Size = UDim2.new(0, 20, 0, 20)
+                Arrow.Position = UDim2.new(1, -25, 0.5, -10)
+                Arrow.Image = "rbxassetid://85893752039651"
+                Arrow.ImageColor3 = theme.TextColor
+                
+                local ButtonCorner = Instance.new("UICorner")
+                ButtonCorner.CornerRadius = UDim.new(0, 4)
+                ButtonCorner.Parent = MainButton
+                
+                local OptionsFrame = Instance.new("Frame")
+                OptionsFrame.Name = "OptionsFrame"
+                OptionsFrame.Parent = DropdownFrame
+                OptionsFrame.BackgroundTransparency = 1
+                OptionsFrame.Position = UDim2.new(0, 0, 0, 40)
+                OptionsFrame.Size = UDim2.new(1, 0, 0, 0)
+                OptionsFrame.Visible = false
+                
+                local OptionsList = Instance.new("UIListLayout")
+                OptionsList.Parent = OptionsFrame
+                OptionsList.Padding = UDim.new(0, 5)
+                
+                local function toggleDropdown()
+                    dropdownOpen = not dropdownOpen
+                    
+                    Tween(Arrow, {
+                        Rotation = dropdownOpen and 180 or 0
+                    }, 0.2)
+                    
                     if dropdownOpen then
-                        toggleDropdown()
-                        toggleDropdown()
+                        local optionCount = #OptionsFrame:GetChildren() - 1
+                        local totalHeight = optionCount * 35 + (optionCount - 1) * 5
+                        
+                        OptionsFrame.Visible = true
+                        Tween(OptionsFrame, {
+                            Size = UDim2.new(1, 0, 0, totalHeight)
+                        }, 0.2)
+                        
+                        Tween(DropdownFrame, {
+                            Size = UDim2.new(1, 0, 0, 35 + totalHeight)
+                        }, 0.2)
+                    else
+                        Tween(OptionsFrame, {
+                            Size = UDim2.new(1, 0, 0, 0)
+                        }, 0.2)
+                        
+                        Tween(DropdownFrame, {
+                            Size = UDim2.new(1, 0, 0, 35)
+                        }, 0.2)
+                        
+                        delay(0.2, function()
+                            OptionsFrame.Visible = false
+                        end)
                     end
-                end,
-                SetOption = function(option)
-                    if table.find(options, option) then
-                        currentOption = option
-                        MainButton.Text = name..": "..currentOption
-                        if callback then callback(option) end
-                    end
-                end,
-                GetOption = function()
-                    return currentOption
-                end,
-                IsOpen = function()
-                    return dropdownOpen
                 end
-            }
+                
+                local function createOptions()
+                    for _, child in ipairs(OptionsFrame:GetChildren()) do
+                        if child:IsA("TextButton") then
+                            child:Destroy()
+                        end
+                    end
+                    
+                    for i, option in ipairs(options) do
+                        local OptionButton = Instance.new("TextButton")
+                        OptionButton.Name = option
+                        OptionButton.Parent = OptionsFrame
+                        OptionButton.BackgroundColor3 = theme.ElementColor
+                        OptionButton.Size = UDim2.new(1, 0, 0, 35)
+                        OptionButton.Font = Enum.Font.Gotham
+                        OptionButton.Text = option
+                        OptionButton.TextColor3 = theme.TextColor
+                        OptionButton.TextSize = 14
+                        OptionButton.AutoButtonColor = false
+                        
+                        local OptionCorner = Instance.new("UICorner")
+                        OptionCorner.CornerRadius = UDim.new(0, 4)
+                        OptionCorner.Parent = OptionButton
+                        
+                        OptionButton.MouseEnter:Connect(function()
+                            Tween(OptionButton, {
+                                BackgroundColor3 = Color3.fromRGB(
+                                    math.floor(theme.ElementColor.R * 255 + 20),
+                                    math.floor(theme.ElementColor.G * 255 + 20),
+                                    math.floor(theme.ElementColor.B * 255 + 20)
+                                )
+                            }, 0.1)
+                        end)
+                        
+                        OptionButton.MouseLeave:Connect(function()
+                            Tween(OptionButton, {
+                                BackgroundColor3 = theme.ElementColor
+                            }, 0.1)
+                        end)
+                        
+                        OptionButton.MouseButton1Click:Connect(function()
+                            currentOption = option
+                            MainButton.Text = name..": "..currentOption
+                            toggleDropdown()
+                            if callback then callback(option) end
+                        end)
+                    end
+                end
+                
+                if options then
+                    createOptions()
+                end
+                
+                MainButton.MouseButton1Click:Connect(function()
+                    toggleDropdown()
+                end)
+                
+                local function onInputBegan(input)
+                    if input.UserInputType == Enum.UserInputType.MouseButton1 and dropdownOpen then
+                        local absolutePosition = DropdownFrame.AbsolutePosition
+                        local absoluteSize = DropdownFrame.AbsoluteSize
+                        
+                        if not (input.Position.X >= absolutePosition.X and 
+                               input.Position.X <= absolutePosition.X + absoluteSize.X and
+                               input.Position.Y >= absolutePosition.Y and 
+                               input.Position.Y <= absolutePosition.Y + absoluteSize.Y) then
+                            toggleDropdown()
+                        end
+                    end
+                end
+                
+                UserInputService.InputBegan:Connect(onInputBegan)
+                
+                return {
+                    RefreshOptions = function(newOptions)
+                        options = newOptions
+                        createOptions()
+                        if dropdownOpen then
+                            toggleDropdown()
+                            toggleDropdown()
+                        end
+                    end,
+                    SetOption = function(option)
+                        if table.find(options, option) then
+                            currentOption = option
+                            MainButton.Text = name..": "..currentOption
+                            if callback then callback(option) end
+                        end
+                    end,
+                    GetOption = function()
+                        return currentOption
+                    end,
+                    IsOpen = function()
+                        return dropdownOpen
+                    end
+                }
+            end
+            
+            -- Função para adicionar Slider à Section
+            function SectionFunctions:NewSlider(name, min, max, default, callback)
+                local SliderFrame = Instance.new("Frame")
+                SliderFrame.Name = name.."_Slider"
+                SliderFrame.Parent = SectionContent
+                SliderFrame.BackgroundTransparency = 1
+                SliderFrame.Size = UDim2.new(1, 0, 0, 50)
+                
+                local SliderText = Instance.new("TextLabel")
+                SliderText.Name = "Text"
+                SliderText.Parent = SliderFrame
+                SliderText.BackgroundTransparency = 1
+                SliderText.Size = UDim2.new(1, 0, 0.4, 0)
+                SliderText.Font = Enum.Font.Gotham
+                SliderText.Text = name..": "..default
+                SliderText.TextColor3 = theme.TextColor
+                SliderText.TextSize = 14
+                SliderText.TextXAlignment = Enum.TextXAlignment.Left
+                
+                local SliderBar = Instance.new("Frame")
+                SliderBar.Name = "Bar"
+                SliderBar.Parent = SliderFrame
+                SliderBar.BackgroundColor3 = theme.ElementColor
+                SliderBar.Size = UDim2.new(1, 0, 0.2, 0)
+                SliderBar.Position = UDim2.new(0, 0, 0.6, 0)
+                
+                local SliderCorner = Instance.new("UICorner")
+                SliderCorner.Parent = SliderBar
+                
+                local SliderFill = Instance.new("Frame")
+                SliderFill.Name = "Fill"
+                SliderFill.Parent = SliderBar
+                SliderFill.BackgroundColor3 = theme.SchemeColor
+                SliderFill.Size = UDim2.new((default - min)/(max - min), 0, 1, 0)
+                
+                local SliderFillCorner = Instance.new("UICorner")
+                SliderFillCorner.Parent = SliderFill
+                
+                local dragging = false
+                
+                local function UpdateSlider(value)
+                    local percent = math.clamp((value - min)/(max - min), 0, 1)
+                    Tween(SliderFill, {
+                        Size = UDim2.new(percent, 0, 1, 0)
+                    }, 0.1)
+                    SliderText.Text = name..": "..math.floor(value)
+                    if callback then callback(value) end
+                end
+                
+                SliderBar.InputBegan:Connect(function(input)
+                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                        dragging = true
+                    end
+                end)
+                
+                SliderBar.InputEnded:Connect(function(input)
+                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                        dragging = false
+                    end
+                end)
+                
+                UserInputService.InputChanged:Connect(function(input)
+                    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+                        local pos = input.Position.X - SliderBar.AbsolutePosition.X
+                        local percent = math.clamp(pos/SliderBar.AbsoluteSize.X, 0, 1)
+                        local value = min + (max - min) * percent
+                        UpdateSlider(value)
+                    end
+                end)
+                
+                return {
+                    Set = function(value)
+                        UpdateSlider(math.clamp(value, min, max))
+                    end,
+                    Get = function()
+                        return tonumber(string.match(SliderText.Text, "%d+"))
+                    end
+                }
+            end
+            
+            return SectionFunctions
         end
         
         return TabFunctions
