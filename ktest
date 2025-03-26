@@ -212,17 +212,10 @@ function SimpleKavo.CreateLib(title, themeName)
     TabsHolder.Size = UDim2.new(1, 0, 0, 0)
     TabsHolder.AutomaticSize = Enum.AutomaticSize.Y
 
-    local TabsList = Instance.new("UIListLayout")
-    TabsList.Parent = TabsHolder
-    TabsList.Padding = UDim.new(0, 5)
-    TabsList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-        TabsHolder.Size = UDim2.new(1, 0, 0, TabsList.AbsoluteContentSize.Y)
-        if #TabsHolder:GetChildren() > 5 then
-            TabsScroll.CanvasSize = UDim2.new(0, 0, 0, TabsList.AbsoluteContentSize.Y)
-        else
-            TabsScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
-        end
-    end)
+    -- Variável para controlar a posição Y dos botões de aba
+    local nextTabPositionY = 0
+    local tabSpacing = 5
+    local tabHeight = 30
     
     -- Área de conteúdo
     local Content = Instance.new("Frame")
@@ -238,13 +231,16 @@ function SimpleKavo.CreateLib(title, themeName)
         TabButton.Name = name
         TabButton.Parent = TabsHolder
         TabButton.BackgroundColor3 = theme.SchemeColor
-        TabButton.Size = UDim2.new(0.9, 0, 0, 30)
+        TabButton.Size = UDim2.new(0.9, 0, 0, tabHeight)
         TabButton.Font = Enum.Font.Gotham
         TabButton.Text = name
         TabButton.TextColor3 = theme.TextColor
         TabButton.TextSize = 14
         TabButton.AnchorPoint = Vector2.new(0.5, 0)
-        TabButton.Position = UDim2.new(0.35, -10, 0, 0)
+        TabButton.Position = UDim2.new(0.35, -10, 0, nextTabPositionY)
+        
+        -- Atualiza a posição para o próximo botão
+        nextTabPositionY = nextTabPositionY + tabHeight + tabSpacing
         
         local TabCorner = Instance.new("UICorner")
         TabCorner.CornerRadius = UDim.new(0, 4)
