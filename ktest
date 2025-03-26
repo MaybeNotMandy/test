@@ -710,17 +710,4 @@ function SimpleKavo.CreateLib(title, themeName)
     }
 end
 
--- Adicione isso no final da sua SimpleKavo, antes do 'return'
-function SimpleKavo:NewDropdown(name, description, options, callback)
-    return self:NewSection(name):NewDropdown(name, description, options, callback)
-end
-
-function SimpleKavo:NewToggle(name, description, callback)
-    return self:NewSection(name):NewToggle(name, description, callback)
-end
-
-function SimpleKavo:NewButton(name, description, callback)
-    return self:NewSection(name):NewButton(name, description, callback)
-end
-
 return SimpleKavo
