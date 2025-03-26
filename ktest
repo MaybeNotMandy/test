@@ -710,17 +710,44 @@ function SimpleKavo.CreateLib(title, themeName)
     }
 end
 
--- Adicione isso no final da sua SimpleKavo, antes do 'return'
-function SimpleKavo:NewDropdown(name, description, options, callback)
-    return self:NewSection(name):NewDropdown(name, description, options, callback)
+-- Adicione isto ANTES do 'return SimpleKavo' no final do arquivo
+
+function SimpleKavo:CreateElementWrapper(elementType)
+    return function(name, description, data, callback)
+        -- Cria uma seção temporária
+        local tempSection = self:NewSection("TempSection")
+        
+        -- Armazena o elemento criado
+        local element
+        
+        -- Cria o elemento conforme o tipo
+        if elementType == "Button" then
+            element = tempSection:NewButton(name, description, callback)
+        elseif elementType == "Toggle" then
+            element = tempSection:NewToggle(name, description, callback)
+        elseif elementType == "Dropdown" then
+            element = tempSection:NewDropdown(name, description, data, callback)
+        end
+        
+        -- Remove a seção temporária
+        tempSection.Container:Destroy()
+        
+        -- Retorna apenas o elemento
+        return element
+    end
 end
 
-function SimpleKavo:NewToggle(name, description, callback)
-    return self:NewSection(name):NewToggle(name, description, callback)
-end
-
-function SimpleKavo:NewButton(name, description, callback)
-    return self:NewSection(name):NewButton(name, description, callback)
+-- Atribui os métodos diretamente à instância
+function SimpleKavo:__index(key)
+    if key == "NewButton" then
+        return self:CreateElementWrapper("Button")
+    elseif key == "NewToggle" then
+        return self:CreateElementWrapper("Toggle")
+    elseif key == "NewDropdown" then
+        return self:CreateElementWrapper("Dropdown")
+    end
+    
+    return rawget(self, key) or rawget(SimpleKavo, key)
 end
 
 return SimpleKavo
