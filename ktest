@@ -196,7 +196,7 @@ function SimpleKavo.CreateLib(title, themeName)
     TabsScroll.Name = "TabsScroll"
     TabsScroll.Parent = Main
     TabsScroll.BackgroundTransparency = 1
-    TabsScroll.Position = UDim2.new(0, 30, 0, 30) -- Movido 10 pixels para direita (era 20)
+    TabsScroll.Position = UDim2.new(0, 30, 0, 30)
     TabsScroll.Size = UDim2.new(0, 140, 1, -30)
     TabsScroll.ScrollBarThickness = 5
     TabsScroll.ScrollBarImageColor3 = theme.SchemeColor
@@ -222,8 +222,8 @@ function SimpleKavo.CreateLib(title, themeName)
     Content.Name = "Content"
     Content.Parent = Main
     Content.BackgroundTransparency = 1
-    Content.Position = UDim2.new(0, 160, 0, 30) -- Ajustado para 160 (era 150)
-    Content.Size = UDim2.new(1, -160, 1, -30)  -- Ajustado para -160
+    Content.Position = UDim2.new(0, 160, 0, 30)
+    Content.Size = UDim2.new(1, -160, 1, -30)
     
     -- Função para adicionar aba
     function SimpleKavo:AddTab(name)
@@ -237,7 +237,7 @@ function SimpleKavo.CreateLib(title, themeName)
         TabButton.TextColor3 = theme.TextColor
         TabButton.TextSize = 14
         TabButton.AnchorPoint = Vector2.new(0.5, 0)
-        TabButton.Position = UDim2.new(0.45, 0, 0, nextTabPositionY) -- Ajustado para 0.45 (era 0.35)
+        TabButton.Position = UDim2.new(0.45, 0, 0, nextTabPositionY)
         
         -- Atualiza a posição para o próximo botão
         nextTabPositionY = nextTabPositionY + tabHeight + tabSpacing
@@ -609,8 +609,8 @@ function SimpleKavo.CreateLib(title, themeName)
                 return addElement(DropdownFrame)
             end
             
-            -- Função para adicionar Slider à Section
-            function SectionFunctions:NewSlider(name, min, max, default, callback)
+            -- Função para adicionar Slider à Section (MODIFICADA PARA VALUE OBJECTS)
+            function SectionFunctions:NewSlider(name, min, max, default, targetValue)
                 local SliderFrame = Instance.new("Frame")
                 SliderFrame.Name = name.."_Slider"
                 SliderFrame.BackgroundTransparency = 1
@@ -650,11 +650,23 @@ function SimpleKavo.CreateLib(title, themeName)
                 
                 local function UpdateSlider(value)
                     local percent = math.clamp((value - min)/(max - min), 0, 1)
+                    local roundedValue = math.floor(value)
+                    
                     Tween(SliderFill, {
                         Size = UDim2.new(percent, 0, 1, 0)
                     }, 0.1)
-                    SliderText.Text = name..": "..math.floor(value)
-                    if callback then callback(value) end
+                    
+                    SliderText.Text = name..": "..roundedValue
+                    
+                    -- Atualiza o ValueObject se existir
+                    if targetValue then
+                        if targetValue:IsA("IntValue") or targetValue:IsA("NumberValue") then
+                            targetValue.Value = roundedValue
+                        elseif targetValue:IsA("BoolValue") then
+                            -- Para BoolValue, podemos definir true/false baseado em um threshold
+                            targetValue.Value = (value > (max - min)/2)
+                        end
+                    end
                 end
                 
                 SliderBar.InputBegan:Connect(function(input)
@@ -677,6 +689,20 @@ function SimpleKavo.CreateLib(title, themeName)
                         UpdateSlider(value)
                     end
                 end)
+                
+                -- Conectar para atualizações externas (se for um ValueObject)
+                if targetValue and targetValue:IsA("ValueBase") then
+                    targetValue:GetPropertyChangedSignal("Value"):Connect(function()
+                        if not dragging then  -- Para evitar loop se o valor for alterado externamente
+                            UpdateSlider(targetValue.Value)
+                        end
+                    end)
+                    
+                    -- Definir valor inicial
+                    UpdateSlider(targetValue.Value)
+                else
+                    UpdateSlider(default)
+                end
                 
                 return addElement(SliderFrame)
             end
