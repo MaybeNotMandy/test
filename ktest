@@ -649,25 +649,25 @@ function SimpleKavo.CreateLib(title, themeName)
                 local dragging = false
                 
                 local function UpdateSlider(value)
+                    value = tonumber(value) or min -- Garante que o valor seja numérico
                     local percent = math.clamp((value - min)/(max - min), 0, 1)
                     local roundedValue = math.floor(value)
-                    
+                
                     Tween(SliderFill, {
                         Size = UDim2.new(percent, 0, 1, 0)
                     }, 0.1)
-                    
+                
                     SliderText.Text = name..": "..roundedValue
-                    
+                
                     -- Atualiza o ValueObject se existir
                     if targetValue then
                         if targetValue:IsA("IntValue") or targetValue:IsA("NumberValue") then
                             targetValue.Value = roundedValue
                         elseif targetValue:IsA("BoolValue") then
-                            -- Para BoolValue, podemos definir true/false baseado em um threshold
                             targetValue.Value = (value > (max - min)/2)
                         end
                     end
-                end
+                end                
                 
                 SliderBar.InputBegan:Connect(function(input)
                     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
