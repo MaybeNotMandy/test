@@ -455,13 +455,13 @@ function SimpleKavo.CreateLib(title, themeName)
             function SectionFunctions:NewDropdown(name, options, defaultOption, callback)
                 local dropdownOpen = false
                 local currentOption = defaultOption or (options and options[1]) or "Selecione"
-                
+
                 local DropdownFrame = Instance.new("Frame")
                 DropdownFrame.Name = name.."_Dropdown"
                 DropdownFrame.BackgroundTransparency = 1
                 DropdownFrame.Size = UDim2.new(1, 0, 0, 35)
                 DropdownFrame.ClipsDescendants = true
-                
+
                 local MainButton = Instance.new("TextButton")
                 MainButton.Name = "MainButton"
                 MainButton.Parent = DropdownFrame
@@ -474,40 +474,43 @@ function SimpleKavo.CreateLib(title, themeName)
                 MainButton.TextXAlignment = Enum.TextXAlignment.Left
                 MainButton.TextYAlignment = Enum.TextYAlignment.Center
                 MainButton.AutoButtonColor = false
-                
-                local Arrow = Instance.new("ImageLabel")
+
+                -- Seta corrigida (usando TextLabel)
+                local Arrow = Instance.new("TextLabel")
                 Arrow.Name = "Arrow"
                 Arrow.Parent = MainButton
                 Arrow.BackgroundTransparency = 1
                 Arrow.Size = UDim2.new(0, 20, 0, 20)
                 Arrow.Position = UDim2.new(1, -25, 0.5, -10)
-                Arrow.Image = "rbxassetid://85893752039651" -- Certifique-se que este asset existe
-                Arrow.ImageColor3 = theme.TextColor
-                
+                Arrow.Font = Enum.Font.GothamBold
+                Arrow.Text = "▼"
+                Arrow.TextColor3 = theme.TextColor
+                Arrow.TextSize = 14
+
                 local ButtonCorner = Instance.new("UICorner")
                 ButtonCorner.CornerRadius = UDim.new(0, 4)
                 ButtonCorner.Parent = MainButton
-                
+
                 local OptionsFrame = Instance.new("ScrollingFrame")
                 OptionsFrame.Name = "OptionsFrame"
                 OptionsFrame.Parent = DropdownFrame
                 OptionsFrame.BackgroundColor3 = theme.ElementColor
-                OptionsFrame.Position = UDim2.new(0, 0, 0, 35) -- Ajustado para aparecer logo abaixo
+                OptionsFrame.Position = UDim2.new(0, 0, 0, 35)
                 OptionsFrame.Size = UDim2.new(1, 0, 0, 0)
                 OptionsFrame.Visible = false
                 OptionsFrame.ScrollBarThickness = 2
                 OptionsFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
                 OptionsFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
-                
+
                 local OptionsCorner = Instance.new("UICorner")
                 OptionsCorner.CornerRadius = UDim.new(0, 4)
                 OptionsCorner.Parent = OptionsFrame
-                
+
                 local OptionsList = Instance.new("UIListLayout")
                 OptionsList.Parent = OptionsFrame
                 OptionsList.Padding = UDim.new(0, 2)
                 OptionsList.HorizontalAlignment = Enum.HorizontalAlignment.Center
-                
+
                 local function createOptions()
                     -- Limpar opções existentes
                     for _, child in ipairs(OptionsFrame:GetChildren()) do
@@ -643,8 +646,10 @@ function SimpleKavo.CreateLib(title, themeName)
                 DropdownFrame.SetCallback = function(newCallback)
                     callback = newCallback
                 end
-                
-                return addElement(DropdownFrame)
+
+                -- RETORNO CORRIGIDO: Adiciona o dropdown à seção e retorna o frame
+                local dropdownElement = addElement(DropdownFrame)
+                return dropdownElement
             end
             
             function SectionFunctions:NewSlider(name, min, max, default, callback)
