@@ -468,9 +468,11 @@ function SimpleKavo.CreateLib(title, themeName)
                 MainButton.BackgroundColor3 = theme.ElementColor
                 MainButton.Size = UDim2.new(1, 0, 0, 35)
                 MainButton.Font = Enum.Font.Gotham
-                MainButton.Text = name..": "..currentOption
+                MainButton.Text = name..": "..tostring(currentOption)
                 MainButton.TextColor3 = theme.TextColor
                 MainButton.TextSize = 14
+                MainButton.TextXAlignment = Enum.TextXAlignment.Left
+                MainButton.TextYAlignment = Enum.TextYAlignment.Center
                 MainButton.AutoButtonColor = false
                 
                 local Arrow = Instance.new("ImageLabel")
@@ -479,20 +481,23 @@ function SimpleKavo.CreateLib(title, themeName)
                 Arrow.BackgroundTransparency = 1
                 Arrow.Size = UDim2.new(0, 20, 0, 20)
                 Arrow.Position = UDim2.new(1, -25, 0.5, -10)
-                Arrow.Image = "rbxassetid://85893752039651"
+                Arrow.Image = "rbxassetid://85893752039651" -- Certifique-se que este asset existe
                 Arrow.ImageColor3 = theme.TextColor
                 
                 local ButtonCorner = Instance.new("UICorner")
                 ButtonCorner.CornerRadius = UDim.new(0, 4)
                 ButtonCorner.Parent = MainButton
                 
-                local OptionsFrame = Instance.new("Frame")
+                local OptionsFrame = Instance.new("ScrollingFrame")
                 OptionsFrame.Name = "OptionsFrame"
                 OptionsFrame.Parent = DropdownFrame
                 OptionsFrame.BackgroundColor3 = theme.ElementColor
-                OptionsFrame.Position = UDim2.new(0, 0, 0, 40)
+                OptionsFrame.Position = UDim2.new(0, 0, 0, 35) -- Ajustado para aparecer logo abaixo
                 OptionsFrame.Size = UDim2.new(1, 0, 0, 0)
                 OptionsFrame.Visible = false
+                OptionsFrame.ScrollBarThickness = 2
+                OptionsFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+                OptionsFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
                 
                 local OptionsCorner = Instance.new("UICorner")
                 OptionsCorner.CornerRadius = UDim.new(0, 4)
@@ -500,7 +505,8 @@ function SimpleKavo.CreateLib(title, themeName)
                 
                 local OptionsList = Instance.new("UIListLayout")
                 OptionsList.Parent = OptionsFrame
-                OptionsList.Padding = UDim.new(0, 5)
+                OptionsList.Padding = UDim.new(0, 2)
+                OptionsList.HorizontalAlignment = Enum.HorizontalAlignment.Center
                 
                 local function createOptions()
                     -- Limpar opções existentes
@@ -513,6 +519,14 @@ function SimpleKavo.CreateLib(title, themeName)
                     -- Verificar se há opções
                     if not options or #options == 0 then
                         warn("Dropdown '"..name.."' criado sem opções!")
+                        local placeholder = Instance.new("TextLabel")
+                        placeholder.Parent = OptionsFrame
+                        placeholder.BackgroundTransparency = 1
+                        placeholder.Size = UDim2.new(1, 0, 0, 30)
+                        placeholder.Text = "Sem opções"
+                        placeholder.TextColor3 = theme.TextColor
+                        placeholder.Font = Enum.Font.Gotham
+                        placeholder.TextSize = 14
                         return
                     end
                     
@@ -523,7 +537,6 @@ function SimpleKavo.CreateLib(title, themeName)
                         OptionButton.Parent = OptionsFrame
                         OptionButton.BackgroundColor3 = theme.ElementColor
                         OptionButton.Size = UDim2.new(1, -10, 0, 30)
-                        OptionButton.Position = UDim2.new(0, 5, 0, (i-1)*35)
                         OptionButton.Font = Enum.Font.Gotham
                         OptionButton.Text = tostring(option)
                         OptionButton.TextColor3 = theme.TextColor
@@ -552,12 +565,12 @@ function SimpleKavo.CreateLib(title, themeName)
                         
                         OptionButton.MouseButton1Click:Connect(function()
                             currentOption = option
-                            MainButton.Text = name..": "..currentOption
+                            MainButton.Text = name..": "..tostring(currentOption)
                             dropdownOpen = false
-                            OptionsFrame.Visible = false
                             Tween(OptionsFrame, {Size = UDim2.new(1, 0, 0, 0)}, 0.2)
                             Tween(DropdownFrame, {Size = UDim2.new(1, 0, 0, 35)}, 0.2)
                             Tween(Arrow, {Rotation = 0}, 0.2)
+                            OptionsFrame.Visible = false
                             if callback then callback(option) end
                         end)
                     end
@@ -573,14 +586,12 @@ function SimpleKavo.CreateLib(title, themeName)
                     }, 0.2)
                     
                     if dropdownOpen then
-                        local optionCount = #OptionsFrame:GetChildren() - 1
-                        local totalHeight = optionCount * 35 + (optionCount - 1) * 5
-                        
+                        local optionCount = #options
+                        local totalHeight = math.min(optionCount * 32, 150) -- Limite máximo de altura
                         OptionsFrame.Visible = true
                         Tween(OptionsFrame, {
                             Size = UDim2.new(1, 0, 0, totalHeight)
                         }, 0.2)
-                        
                         Tween(DropdownFrame, {
                             Size = UDim2.new(1, 0, 0, 35 + totalHeight)
                         }, 0.2)
@@ -588,20 +599,16 @@ function SimpleKavo.CreateLib(title, themeName)
                         Tween(OptionsFrame, {
                             Size = UDim2.new(1, 0, 0, 0)
                         }, 0.2)
-                        
                         Tween(DropdownFrame, {
                             Size = UDim2.new(1, 0, 0, 35)
                         }, 0.2)
-                        
                         delay(0.2, function()
                             OptionsFrame.Visible = false
                         end)
                     end
                 end
                 
-                MainButton.MouseButton1Click:Connect(function()
-                    toggleDropdown()
-                end)
+                MainButton.MouseButton1Click:Connect(toggleDropdown)
                 
                 local function onInputBegan(input)
                     if input.UserInputType == Enum.UserInputType.MouseButton1 and dropdownOpen then
@@ -622,12 +629,12 @@ function SimpleKavo.CreateLib(title, themeName)
                 DropdownFrame.Update = function(newOptions, newDefault)
                     options = newOptions or options
                     currentOption = newDefault or currentOption or (options and options[1]) or "Selecione"
-                    MainButton.Text = name..": "..currentOption
+                    MainButton.Text = name..": "..tostring(currentOption)
                     createOptions()
                     
                     if dropdownOpen then
-                        local optionCount = #OptionsFrame:GetChildren() - 1
-                        local totalHeight = optionCount * 35 + (optionCount - 1) * 5
+                        local optionCount = #options
+                        local totalHeight = math.min(optionCount * 32, 150)
                         OptionsFrame.Size = UDim2.new(1, 0, 0, totalHeight)
                         DropdownFrame.Size = UDim2.new(1, 0, 0, 35 + totalHeight)
                     end
