@@ -453,93 +453,93 @@ function SimpleKavo.CreateLib(title, themeName)
             end
             
             function SectionFunctions:NewDropdown(name, options, defaultOption, callback)
-                local dropdownOpen = false
-                local currentOption = defaultOption or (options and options[1]) or "Selecione"
-
+                -- Estado do dropdown
+                local isOpen = false
+                local selectedOption = defaultOption or (options and options[1]) or "Selecione"
+                
+                -- Frame principal do dropdown
                 local DropdownFrame = Instance.new("Frame")
                 DropdownFrame.Name = name.."_Dropdown"
                 DropdownFrame.Parent = SectionContent
                 DropdownFrame.BackgroundTransparency = 1
                 DropdownFrame.Size = UDim2.new(1, 0, 0, 35)
                 DropdownFrame.ClipsDescendants = true
-
+                
+                -- Botão principal
                 local MainButton = Instance.new("TextButton")
                 MainButton.Name = "MainButton"
                 MainButton.Parent = DropdownFrame
                 MainButton.BackgroundColor3 = theme.ElementColor
                 MainButton.Size = UDim2.new(1, 0, 0, 35)
                 MainButton.Font = Enum.Font.Gotham
-                MainButton.Text = name..": "..tostring(currentOption)
+                MainButton.Text = name..": "..tostring(selectedOption)
                 MainButton.TextColor3 = theme.TextColor
                 MainButton.TextSize = 14
                 MainButton.TextXAlignment = Enum.TextXAlignment.Left
-                MainButton.TextYAlignment = Enum.TextYAlignment.Center
+                MainButton.Position = UDim2.new(0, 5, 0, 0)
                 MainButton.AutoButtonColor = false
-
+                
+                local ButtonCorner = Instance.new("UICorner")
+                ButtonCorner.CornerRadius = UDim.new(0, 4)
+                ButtonCorner.Parent = MainButton
+                
+                -- Seta indicadora
                 local Arrow = Instance.new("TextLabel")
                 Arrow.Name = "Arrow"
                 Arrow.Parent = MainButton
                 Arrow.BackgroundTransparency = 1
                 Arrow.Size = UDim2.new(0, 20, 0, 20)
-                Arrow.Position = UDim2.new(1, -25, 0.5, -10)
-                Arrow.Font = Enum.Font.GothamBold
+                Arrow.Position = UDim2.new(1, -25, 0, 7)
                 Arrow.Text = "▼"
                 Arrow.TextColor3 = theme.TextColor
+                Arrow.Font = Enum.Font.Gotham
                 Arrow.TextSize = 14
-
-                local ButtonCorner = Instance.new("UICorner")
-                ButtonCorner.CornerRadius = UDim.new(0, 4)
-                ButtonCorner.Parent = MainButton
-
-                local OptionsFrame = Instance.new("ScrollingFrame")
+                
+                -- Frame das opções
+                local OptionsFrame = Instance.new("Frame")
                 OptionsFrame.Name = "OptionsFrame"
                 OptionsFrame.Parent = DropdownFrame
                 OptionsFrame.BackgroundColor3 = theme.ElementColor
-                OptionsFrame.Position = UDim2.new(0, 0, 0, 35)
+                OptionsFrame.Position = UDim2.new(0, 5, 0, 40)
                 OptionsFrame.Size = UDim2.new(1, 0, 0, 0)
                 OptionsFrame.Visible = false
-                OptionsFrame.ScrollBarThickness = 2
-                OptionsFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
-                OptionsFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
-
+                OptionsFrame.ClipsDescendants = true
+                
                 local OptionsCorner = Instance.new("UICorner")
                 OptionsCorner.CornerRadius = UDim.new(0, 4)
                 OptionsCorner.Parent = OptionsFrame
-
+                
                 local OptionsList = Instance.new("UIListLayout")
                 OptionsList.Parent = OptionsFrame
-                OptionsList.Padding = UDim.new(0, 2)
-                OptionsList.HorizontalAlignment = Enum.HorizontalAlignment.Center
-
+                OptionsList.Padding = UDim.new(0, 5)
+                OptionsList.HorizontalAlignment = Enum.HorizontalAlignment.Left
+                
+                -- Função para criar as opções
                 local function createOptions()
-                    -- Limpar opções existentes
                     for _, child in ipairs(OptionsFrame:GetChildren()) do
                         if child:IsA("TextButton") then
                             child:Destroy()
                         end
                     end
                     
-                    -- Verificar se há opções
                     if not options or #options == 0 then
-                        warn("Dropdown '"..name.."' criado sem opções!")
-                        local placeholder = Instance.new("TextLabel")
-                        placeholder.Parent = OptionsFrame
-                        placeholder.BackgroundTransparency = 1
-                        placeholder.Size = UDim2.new(1, 0, 0, 30)
-                        placeholder.Text = "Sem opções"
-                        placeholder.TextColor3 = theme.TextColor
-                        placeholder.Font = Enum.Font.Gotham
-                        placeholder.TextSize = 14
+                        local NoOptions = Instance.new("TextLabel")
+                        NoOptions.Parent = OptionsFrame
+                        NoOptions.BackgroundTransparency = 1
+                        NoOptions.Size = UDim2.new(1, 0, 0, 30)
+                        NoOptions.Text = "Sem opções"
+                        NoOptions.TextColor3 = theme.TextColor
+                        NoOptions.Font = Enum.Font.Gotham
+                        NoOptions.TextSize = 12
                         return
                     end
                     
-                    -- Criar botões para cada opção
                     for i, option in ipairs(options) do
                         local OptionButton = Instance.new("TextButton")
                         OptionButton.Name = tostring(option)
                         OptionButton.Parent = OptionsFrame
                         OptionButton.BackgroundColor3 = theme.ElementColor
-                        OptionButton.Size = UDim2.new(1, -10, 0, 30)
+                        OptionButton.Size = UDim2.new(1, 0, 0, 30)
                         OptionButton.Font = Enum.Font.Gotham
                         OptionButton.Text = tostring(option)
                         OptionButton.TextColor3 = theme.TextColor
@@ -549,6 +549,17 @@ function SimpleKavo.CreateLib(title, themeName)
                         local OptionCorner = Instance.new("UICorner")
                         OptionCorner.CornerRadius = UDim.new(0, 4)
                         OptionCorner.Parent = OptionButton
+                        
+                        OptionButton.MouseButton1Click:Connect(function()
+                            selectedOption = option
+                            MainButton.Text = name..": "..tostring(selectedOption)
+                            isOpen = false
+                            OptionsFrame.Visible = false
+                            Tween(OptionsFrame, {Size = UDim2.new(1, 0, 0, 0)}, 0.2)
+                            Tween(DropdownFrame, {Size = UDim2.new(1, 0, 0, 35)}, 0.2)
+                            Tween(Arrow, {Rotation = 0}, 0.2)
+                            if callback then callback(option) end
+                        end)
                         
                         OptionButton.MouseEnter:Connect(function()
                             Tween(OptionButton, {
@@ -561,93 +572,71 @@ function SimpleKavo.CreateLib(title, themeName)
                         end)
                         
                         OptionButton.MouseLeave:Connect(function()
-                            Tween(OptionButton, {
-                                BackgroundColor3 = theme.ElementColor
-                            }, 0.1)
-                        end)
-                        
-                        OptionButton.MouseButton1Click:Connect(function()
-                            currentOption = option
-                            MainButton.Text = name..": "..tostring(currentOption)
-                            dropdownOpen = false
-                            Tween(OptionsFrame, {Size = UDim2.new(1, 0, 0, 0)}, 0.2)
-                            Tween(DropdownFrame, {Size = UDim2.new(1, 0, 0, 35)}, 0.2)
-                            Tween(Arrow, {Rotation = 0}, 0.2)
-                            OptionsFrame.Visible = false
-                            if callback then callback(option) end
+                            Tween(OptionButton, {BackgroundColor3 = theme.ElementColor}, 0.1)
                         end)
                     end
                 end
                 
                 createOptions()
                 
+                -- Função para abrir/fechar o dropdown
                 local function toggleDropdown()
-                    dropdownOpen = not dropdownOpen
+                    isOpen = not isOpen
+                    Tween(Arrow, {Rotation = isOpen and 180 or 0}, 0.2)
                     
-                    Tween(Arrow, {
-                        Rotation = dropdownOpen and 180 or 0
-                    }, 0.2)
-                    
-                    if dropdownOpen then
-                        local optionCount = #options
-                        local totalHeight = math.min(optionCount * 32, 150) -- Limite máximo de altura
+                    if isOpen then
+                        local optionCount = #options > 0 and #options or 1
+                        local totalHeight = optionCount * 35
                         OptionsFrame.Visible = true
-                        Tween(OptionsFrame, {
-                            Size = UDim2.new(1, 0, 0, totalHeight)
-                        }, 0.2)
-                        Tween(DropdownFrame, {
-                            Size = UDim2.new(1, 0, 0, 35 + totalHeight)
-                        }, 0.2)
+                        Tween(OptionsFrame, {Size = UDim2.new(1, 0, 0, totalHeight)}, 0.2)
+                        Tween(DropdownFrame, {Size = UDim2.new(1, 0, 0, 35 + totalHeight)}, 0.2)
                     else
-                        Tween(OptionsFrame, {
-                            Size = UDim2.new(1, 0, 0, 0)
-                        }, 0.2)
-                        Tween(DropdownFrame, {
-                            Size = UDim2.new(1, 0, 0, 35)
-                        }, 0.2)
-                        delay(0.2, function()
-                            OptionsFrame.Visible = false
-                        end)
+                        Tween(OptionsFrame, {Size = UDim2.new(1, 0, 0, 0)}, 0.2)
+                        Tween(DropdownFrame, {Size = UDim2.new(1, 0, 0, 35)}, 0.2)
+                        wait(0.2)
+                        OptionsFrame.Visible = false
                     end
                 end
                 
                 MainButton.MouseButton1Click:Connect(toggleDropdown)
                 
-                local function onInputBegan(input)
-                    if input.UserInputType == Enum.UserInputType.MouseButton1 and dropdownOpen then
-                        local absolutePosition = DropdownFrame.AbsolutePosition
-                        local absoluteSize = DropdownFrame.AbsoluteSize
+                -- Fechar ao clicar fora
+                UserInputService.InputBegan:Connect(function(input)
+                    if input.UserInputType == Enum.UserInputType.MouseButton1 and isOpen then
+                        local pos = input.Position
+                        local framePos = DropdownFrame.AbsolutePosition
+                        local frameSize = DropdownFrame.AbsoluteSize
                         
-                        if not (input.Position.X >= absolutePosition.X and 
-                               input.Position.X <= absolutePosition.X + absoluteSize.X and
-                               input.Position.Y >= absolutePosition.Y and 
-                               input.Position.Y <= absolutePosition.Y + absoluteSize.Y) then
+                        if not (pos.X >= framePos.X and pos.X <= framePos.X + frameSize.X and
+                                pos.Y >= framePos.Y and pos.Y <= framePos.Y + frameSize.Y) then
                             toggleDropdown()
                         end
                     end
-                end
+                end)
                 
-                UserInputService.InputBegan:Connect(onInputBegan)
-                
-                DropdownFrame.Update = function(newOptions, newDefault)
-                    options = newOptions or options
-                    currentOption = newDefault or currentOption or (options and options[1]) or "Selecione"
-                    MainButton.Text = name..": "..tostring(currentOption)
-                    createOptions()
-                    
-                    if dropdownOpen then
-                        local optionCount = #options
-                        local totalHeight = math.min(optionCount * 32, 150)
-                        OptionsFrame.Size = UDim2.new(1, 0, 0, totalHeight)
-                        DropdownFrame.Size = UDim2.new(1, 0, 0, 35 + totalHeight)
+                -- Funções de controle
+                DropdownFrame.Set = function(newOption)
+                    if table.find(options, newOption) then
+                        selectedOption = newOption
+                        MainButton.Text = name..": "..tostring(selectedOption)
                     end
                 end
                 
-                DropdownFrame.SetCallback = function(newCallback)
-                    callback = newCallback
+                DropdownFrame.Get = function()
+                    return selectedOption
                 end
-
-                return DropdownFrame
+                
+                DropdownFrame.Update = function(newOptions, newDefault)
+                    options = newOptions or options
+                    selectedOption = newDefault or selectedOption or (options and options[1]) or "Selecione"
+                    MainButton.Text = name..": "..tostring(selectedOption)
+                    createOptions()
+                    if isOpen then
+                        toggleDropdown()
+                    end
+                end
+                
+                return addElement(DropdownFrame)
             end
             
             function SectionFunctions:NewSlider(name, min, max, default, callback)
