@@ -458,6 +458,7 @@ function SimpleKavo.CreateLib(title, themeName)
 
                 local DropdownFrame = Instance.new("Frame")
                 DropdownFrame.Name = name.."_Dropdown"
+                DropdownFrame.Parent = SectionContent
                 DropdownFrame.BackgroundTransparency = 1
                 DropdownFrame.Size = UDim2.new(1, 0, 0, 35)
                 DropdownFrame.ClipsDescendants = true
@@ -475,7 +476,6 @@ function SimpleKavo.CreateLib(title, themeName)
                 MainButton.TextYAlignment = Enum.TextYAlignment.Center
                 MainButton.AutoButtonColor = false
 
-                -- Seta corrigida (usando TextLabel)
                 local Arrow = Instance.new("TextLabel")
                 Arrow.Name = "Arrow"
                 Arrow.Parent = MainButton
@@ -647,9 +647,7 @@ function SimpleKavo.CreateLib(title, themeName)
                     callback = newCallback
                 end
 
-                -- RETORNO CORRIGIDO: Adiciona o dropdown à seção e retorna o frame
-                local dropdownElement = addElement(DropdownFrame)
-                return dropdownElement
+                return DropdownFrame
             end
             
             function SectionFunctions:NewSlider(name, min, max, default, callback)
