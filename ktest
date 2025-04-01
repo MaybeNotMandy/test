@@ -204,6 +204,7 @@ function SimpleKavo.CreateLib(title, themeName)
     local TabsList = Instance.new("UIListLayout")
     TabsList.Parent = TabsHolder
     TabsList.Padding = UDim.new(0, 5)
+    TabsList.SortOrder = Enum.SortOrder.LayoutOrder
     TabsList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
         TabsHolder.Size = UDim2.new(1, 0, 0, TabsList.AbsoluteContentSize.Y)
         if #TabsHolder:GetChildren() > 5 then
@@ -220,14 +221,15 @@ function SimpleKavo.CreateLib(title, themeName)
     Content.Position = UDim2.new(0, 150, 0, 30)
     Content.Size = UDim2.new(1, -150, 1, -30)
     
-    -- Função para adicionar tabs (mantida na ordem de criação)
-    local tabOrder = {}
+    -- Variável para controlar a ordem das tabs
+    local tabsOrder = {}
+    local currentTab = nil
     
     function SimpleKavo:AddTab(name)
         local TabButton = Instance.new("TextButton")
         TabButton.Name = name
         TabButton.Parent = TabsHolder
-        TabButton.BackgroundColor3 = theme.SchemeColor
+        TabButton.BackgroundColor3 = theme.ElementColor
         TabButton.Size = UDim2.new(0.9, 0, 0, 30)
         TabButton.Font = Enum.Font.Gotham
         TabButton.Text = name
@@ -235,6 +237,7 @@ function SimpleKavo.CreateLib(title, themeName)
         TabButton.TextSize = 14
         TabButton.AnchorPoint = Vector2.new(0.5, 0)
         TabButton.Position = UDim2.new(0.35, -10, 0, 0)
+        TabButton.LayoutOrder = #tabsOrder + 1
         
         local TabCorner = Instance.new("UICorner")
         TabCorner.CornerRadius = UDim.new(0, 4)
@@ -256,28 +259,33 @@ function SimpleKavo.CreateLib(title, themeName)
         TabContentList.Padding = UDim.new(0, 10)
         TabContentList.HorizontalAlignment = Enum.HorizontalAlignment.Center
         
-        -- Adiciona à lista de ordem de tabs
-        table.insert(tabOrder, {button = TabButton, content = TabContent})
+        -- Adiciona a tab à lista de ordem
+        table.insert(tabsOrder, {
+            button = TabButton,
+            content = TabContent
+        })
         
         TabButton.MouseButton1Click:Connect(function()
-            for _, tab in ipairs(tabOrder) do
+            -- Esconde todas as tabs
+            for _, tab in ipairs(tabsOrder) do
                 tab.content.Visible = false
                 Tween(tab.button, {BackgroundColor3 = theme.ElementColor}, 0.2)
             end
+            
+            -- Mostra apenas a tab clicada
             TabContent.Visible = true
             Tween(TabButton, {BackgroundColor3 = theme.SchemeColor}, 0.2)
+            currentTab = TabContent
         end)
         
         -- Ativa a primeira tab criada
-        if #tabOrder == 1 then
+        if #tabsOrder == 1 then
             TabContent.Visible = true
             Tween(TabButton, {BackgroundColor3 = theme.SchemeColor}, 0.2)
+            currentTab = TabContent
         end
         
         local TabFunctions = {}
-        
-        -- Função para criar seções (mantendo ordem)
-        local sectionOrder = {}
         
         function TabFunctions:NewSection(name)
             local SectionFrame = Instance.new("Frame")
@@ -325,19 +333,16 @@ function SimpleKavo.CreateLib(title, themeName)
             SectionList.Padding = UDim.new(0, 5)
             SectionList.SortOrder = Enum.SortOrder.LayoutOrder
             
-            -- Adiciona à lista de ordem de seções
-            table.insert(sectionOrder, SectionFrame)
-            
-            local SectionFunctions = {}
-            
-            -- Função para criar elementos (mantendo ordem)
-            local elementOrder = {}
+            local elementOrder = 0
             
             local function addElement(element)
+                elementOrder = elementOrder + 1
+                element.LayoutOrder = elementOrder
                 element.Parent = SectionContent
-                table.insert(elementOrder, element)
                 return element
             end
+            
+            local SectionFunctions = {}
             
             function SectionFunctions:NewButton(name, description, callback)
                 local Button = Instance.new("TextButton")
@@ -349,7 +354,6 @@ function SimpleKavo.CreateLib(title, themeName)
                 Button.TextColor3 = theme.TextColor
                 Button.TextSize = 14
                 Button.AutoButtonColor = false
-                Button.LayoutOrder = #elementOrder + 1
                 
                 if description then
                     local DescLabel = Instance.new("TextLabel")
@@ -397,7 +401,6 @@ function SimpleKavo.CreateLib(title, themeName)
                 ToggleFrame.Name = name.."_Toggle"
                 ToggleFrame.BackgroundTransparency = 1
                 ToggleFrame.Size = UDim2.new(1, 0, 0, 35)
-                ToggleFrame.LayoutOrder = #elementOrder + 1
                 
                 local ToggleButton = Instance.new("TextButton")
                 ToggleButton.Name = "Button"
@@ -458,7 +461,6 @@ function SimpleKavo.CreateLib(title, themeName)
                 DropdownFrame.BackgroundTransparency = 1
                 DropdownFrame.Size = UDim2.new(1, 0, 0, 35)
                 DropdownFrame.ClipsDescendants = true
-                DropdownFrame.LayoutOrder = #elementOrder + 1
                 
                 local MainButton = Instance.new("TextButton")
                 MainButton.Name = "MainButton"
@@ -633,7 +635,6 @@ function SimpleKavo.CreateLib(title, themeName)
                 SliderFrame.Name = name.."_Slider"
                 SliderFrame.BackgroundTransparency = 1
                 SliderFrame.Size = UDim2.new(1, 0, 0, 50)
-                SliderFrame.LayoutOrder = #elementOrder + 1
                 
                 local SliderText = Instance.new("TextLabel")
                 SliderText.Name = "Text"
