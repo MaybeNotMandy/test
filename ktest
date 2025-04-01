@@ -624,12 +624,6 @@ function SimpleKavo.CreateLib(title, themeName)
                 return addElement(DropdownFrame)
             end
             
-            function SectionFunctions:UpdateDropdown(dropdownInstance, newOptions, newDefault)
-                if dropdownInstance and dropdownInstance.Update then
-                    dropdownInstance.Update(newOptions, newDefault)
-                end
-            end
-            
             function SectionFunctions:NewSlider(name, min, max, default, callback)
                 local SliderFrame = Instance.new("Frame")
                 SliderFrame.Name = name.."_Slider"
