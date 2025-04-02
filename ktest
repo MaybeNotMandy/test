@@ -471,7 +471,6 @@ function SimpleKavo.CreateLib(title, themeName)
                 function toggleMethods:Set(newState)
                     State = newState
                     UpdateToggle()
-                    if callback then callback(State) end
                 end
                 
                 function toggleMethods:Get()
@@ -715,6 +714,7 @@ function SimpleKavo.CreateLib(title, themeName)
                 SliderText.TextSize = 14
                 SliderText.TextXAlignment = Enum.TextXAlignment.Left
                 
+                -- Adicionando descrição se fornecida
                 if description then
                     local DescLabel = Instance.new("TextLabel")
                     DescLabel.Name = "Description"
@@ -734,7 +734,7 @@ function SimpleKavo.CreateLib(title, themeName)
                 SliderBar.Parent = SliderFrame
                 SliderBar.BackgroundColor3 = theme.ElementColor
                 SliderBar.Size = UDim2.new(1, 0, 0.2, 0)
-                SliderBar.Position = UDim2.new(0, 0, 0.8, 0)
+                SliderBar.Position = UDim2.new(0, 0, description and 0.7 or 0.6, 0)
                 
                 local SliderCorner = Instance.new("UICorner")
                 SliderCorner.Parent = SliderBar
