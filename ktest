@@ -391,7 +391,7 @@ function SimpleKavo.CreateLib(title, themeName)
                 return Button
             end
             
-            function SectionFunctions:NewToggle(name, description, default, callback)
+            function SectionFunctions:NewToggle(name, default, callback)
                 local elementOrder = #SectionContent:GetChildren()
                 
                 local ToggleFrame = Instance.new("Frame")
@@ -403,7 +403,7 @@ function SimpleKavo.CreateLib(title, themeName)
                 local ToggleButton = Instance.new("TextButton")
                 ToggleButton.Name = "Button"
                 ToggleButton.Parent = ToggleFrame
-                ToggleButton.BackgroundColor3 = default and theme.SchemeColor or theme.ElementColor
+                ToggleButton.BackgroundColor3 = theme.ElementColor
                 ToggleButton.Size = UDim2.new(0.2, 0, 0.8, 0)
                 ToggleButton.Position = UDim2.new(0.75, 0, 0.1, 0)
                 ToggleButton.Font = Enum.Font.Gotham
@@ -425,21 +425,6 @@ function SimpleKavo.CreateLib(title, themeName)
                 ToggleText.TextSize = 14
                 ToggleText.TextXAlignment = Enum.TextXAlignment.Left
                 
-                -- Adicionando descrição se fornecida
-                if description then
-                    local DescLabel = Instance.new("TextLabel")
-                    DescLabel.Name = "Description"
-                    DescLabel.Parent = ToggleFrame
-                    DescLabel.BackgroundTransparency = 1
-                    DescLabel.Position = UDim2.new(0, 10, 1, -15)
-                    DescLabel.Size = UDim2.new(1, -20, 0, 12)
-                    DescLabel.Font = Enum.Font.Gotham
-                    DescLabel.Text = description
-                    DescLabel.TextColor3 = theme.TextColor
-                    DescLabel.TextSize = 10
-                    DescLabel.TextXAlignment = Enum.TextXAlignment.Left
-                end
-                
                 local State = default or false
                 
                 local function UpdateToggle()
@@ -454,7 +439,6 @@ function SimpleKavo.CreateLib(title, themeName)
                     end
                 end
                 
-                -- Atualiza imediatamente para refletir o estado inicial
                 UpdateToggle()
                 
                 ToggleButton.MouseButton1Click:Connect(function()
@@ -464,30 +448,6 @@ function SimpleKavo.CreateLib(title, themeName)
                 end)
                 
                 ToggleFrame.Parent = SectionContent
-                
-                -- Métodos para controle externo
-                local toggleMethods = {}
-                
-                function toggleMethods:Set(newState)
-                    State = newState
-                    UpdateToggle()
-                end
-                
-                function toggleMethods:Get()
-                    return State
-                end
-                
-                function toggleMethods:Toggle()
-                    State = not State
-                    UpdateToggle()
-                    if callback then callback(State) end
-                end
-                
-                -- Adiciona métodos ao frame de retorno
-                for name, func in pairs(toggleMethods) do
-                    ToggleFrame[name] = func
-                end
-                
                 return ToggleFrame
             end
             
@@ -694,7 +654,7 @@ function SimpleKavo.CreateLib(title, themeName)
                 return DropdownFrame
             end
             
-            function SectionFunctions:NewSlider(name, description, min, max, default, callback)
+            function SectionFunctions:NewSlider(name, min, max, default, callback)
                 local elementOrder = #SectionContent:GetChildren()
                 
                 local SliderFrame = Instance.new("Frame")
@@ -714,27 +674,12 @@ function SimpleKavo.CreateLib(title, themeName)
                 SliderText.TextSize = 14
                 SliderText.TextXAlignment = Enum.TextXAlignment.Left
                 
-                -- Adicionando descrição se fornecida
-                if description then
-                    local DescLabel = Instance.new("TextLabel")
-                    DescLabel.Name = "Description"
-                    DescLabel.Parent = SliderFrame
-                    DescLabel.BackgroundTransparency = 1
-                    DescLabel.Position = UDim2.new(0, 0, 0.4, 0)
-                    DescLabel.Size = UDim2.new(1, 0, 0.2, 0)
-                    DescLabel.Font = Enum.Font.Gotham
-                    DescLabel.Text = description
-                    DescLabel.TextColor3 = theme.TextColor
-                    DescLabel.TextSize = 10
-                    DescLabel.TextXAlignment = Enum.TextXAlignment.Left
-                end
-                
                 local SliderBar = Instance.new("Frame")
                 SliderBar.Name = "Bar"
                 SliderBar.Parent = SliderFrame
                 SliderBar.BackgroundColor3 = theme.ElementColor
                 SliderBar.Size = UDim2.new(1, 0, 0.2, 0)
-                SliderBar.Position = UDim2.new(0, 0, description and 0.7 or 0.6, 0)
+                SliderBar.Position = UDim2.new(0, 0, 0.6, 0)
                 
                 local SliderCorner = Instance.new("UICorner")
                 SliderCorner.Parent = SliderBar
