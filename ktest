@@ -333,18 +333,11 @@ function SimpleKavo.CreateLib(title, themeName)
             SectionList.Padding = UDim.new(0, 5)
             SectionList.SortOrder = Enum.SortOrder.LayoutOrder
             
-            local elementOrder = 0
-            
-            local function addElement(element)
-                elementOrder = elementOrder + 1
-                element.LayoutOrder = elementOrder
-                element.Parent = SectionContent
-                return element
-            end
-            
             local SectionFunctions = {}
             
             function SectionFunctions:NewButton(name, description, callback)
+                local elementOrder = #SectionContent:GetChildren()
+                
                 local Button = Instance.new("TextButton")
                 Button.Name = name
                 Button.BackgroundColor3 = theme.ElementColor
@@ -354,6 +347,7 @@ function SimpleKavo.CreateLib(title, themeName)
                 Button.TextColor3 = theme.TextColor
                 Button.TextSize = 14
                 Button.AutoButtonColor = false
+                Button.LayoutOrder = elementOrder
                 
                 if description then
                     local DescLabel = Instance.new("TextLabel")
@@ -393,14 +387,18 @@ function SimpleKavo.CreateLib(title, themeName)
                     if callback then callback() end
                 end)
                 
-                return addElement(Button)
+                Button.Parent = SectionContent
+                return Button
             end
             
             function SectionFunctions:NewToggle(name, default, callback)
+                local elementOrder = #SectionContent:GetChildren()
+                
                 local ToggleFrame = Instance.new("Frame")
                 ToggleFrame.Name = name.."_Toggle"
                 ToggleFrame.BackgroundTransparency = 1
                 ToggleFrame.Size = UDim2.new(1, 0, 0, 35)
+                ToggleFrame.LayoutOrder = elementOrder
                 
                 local ToggleButton = Instance.new("TextButton")
                 ToggleButton.Name = "Button"
@@ -449,10 +447,13 @@ function SimpleKavo.CreateLib(title, themeName)
                     if callback then callback(State) end
                 end)
                 
-                return addElement(ToggleFrame)
+                ToggleFrame.Parent = SectionContent
+                return ToggleFrame
             end
             
             function SectionFunctions:NewDropdown(name, options, defaultOption, callback)
+                local elementOrder = #SectionContent:GetChildren()
+                
                 -- Estado do dropdown
                 local isOpen = false
                 local selectedOption = defaultOption or (options and options[1]) or "Selecione"
@@ -460,10 +461,10 @@ function SimpleKavo.CreateLib(title, themeName)
                 -- Frame principal do dropdown
                 local DropdownFrame = Instance.new("Frame")
                 DropdownFrame.Name = name.."_Dropdown"
-                DropdownFrame.Parent = SectionContent
                 DropdownFrame.BackgroundTransparency = 1
                 DropdownFrame.Size = UDim2.new(1, 0, 0, 35)
                 DropdownFrame.ClipsDescendants = true
+                DropdownFrame.LayoutOrder = elementOrder
                 
                 -- Botão principal
                 local MainButton = Instance.new("TextButton")
@@ -476,7 +477,6 @@ function SimpleKavo.CreateLib(title, themeName)
                 MainButton.TextColor3 = theme.TextColor
                 MainButton.TextSize = 14
                 MainButton.TextXAlignment = Enum.TextXAlignment.Left
-                MainButton.Position = UDim2.new(0, 5, 0, 0)
                 MainButton.AutoButtonColor = false
                 
                 local ButtonCorner = Instance.new("UICorner")
@@ -500,7 +500,7 @@ function SimpleKavo.CreateLib(title, themeName)
                 OptionsFrame.Name = "OptionsFrame"
                 OptionsFrame.Parent = DropdownFrame
                 OptionsFrame.BackgroundColor3 = theme.ElementColor
-                OptionsFrame.Position = UDim2.new(0, 5, 0, 40)
+                OptionsFrame.Position = UDim2.new(0, 0, 0, 40)
                 OptionsFrame.Size = UDim2.new(1, 0, 0, 0)
                 OptionsFrame.Visible = false
                 OptionsFrame.ClipsDescendants = true
@@ -539,7 +539,8 @@ function SimpleKavo.CreateLib(title, themeName)
                         OptionButton.Name = tostring(option)
                         OptionButton.Parent = OptionsFrame
                         OptionButton.BackgroundColor3 = theme.ElementColor
-                        OptionButton.Size = UDim2.new(1, 0, 0, 30)
+                        OptionButton.Size = UDim2.new(1, -10, 0, 30)
+                        OptionButton.Position = UDim2.new(0, 5, 0, 0)
                         OptionButton.Font = Enum.Font.Gotham
                         OptionButton.Text = tostring(option)
                         OptionButton.TextColor3 = theme.TextColor
@@ -586,13 +587,13 @@ function SimpleKavo.CreateLib(title, themeName)
                     
                     if isOpen then
                         local optionCount = #options > 0 and #options or 1
-                        local totalHeight = optionCount * 35
+                        local totalHeight = optionCount * 35 + (optionCount-1)*5 -- Altura total com padding
                         OptionsFrame.Visible = true
+                        Tween(DropdownFrame, {Size = UDim2.new(1, 0, 0, 35 + totalHeight + 5)}, 0.2)
                         Tween(OptionsFrame, {Size = UDim2.new(1, 0, 0, totalHeight)}, 0.2)
-                        Tween(DropdownFrame, {Size = UDim2.new(1, 0, 0, 35 + totalHeight)}, 0.2)
                     else
-                        Tween(OptionsFrame, {Size = UDim2.new(1, 0, 0, 0)}, 0.2)
                         Tween(DropdownFrame, {Size = UDim2.new(1, 0, 0, 35)}, 0.2)
+                        Tween(OptionsFrame, {Size = UDim2.new(1, 0, 0, 0)}, 0.2)
                         wait(0.2)
                         OptionsFrame.Visible = false
                     end
@@ -601,32 +602,39 @@ function SimpleKavo.CreateLib(title, themeName)
                 MainButton.MouseButton1Click:Connect(toggleDropdown)
                 
                 -- Fechar ao clicar fora
-                UserInputService.InputBegan:Connect(function(input)
+                local dropdownConnection
+                dropdownConnection = UserInputService.InputBegan:Connect(function(input)
                     if input.UserInputType == Enum.UserInputType.MouseButton1 and isOpen then
                         local pos = input.Position
                         local framePos = DropdownFrame.AbsolutePosition
                         local frameSize = DropdownFrame.AbsoluteSize
                         
                         if not (pos.X >= framePos.X and pos.X <= framePos.X + frameSize.X and
-                                pos.Y >= framePos.Y and pos.Y <= framePos.Y + frameSize.Y) then
+                               pos.Y >= framePos.Y and pos.Y <= framePos.Y + frameSize.Y) then
                             toggleDropdown()
                         end
                     end
                 end)
                 
+                DropdownFrame.Destroying:Connect(function()
+                    dropdownConnection:Disconnect()
+                end)
+                
                 -- Funções de controle
-                DropdownFrame.Set = function(newOption)
+                local dropdownMethods = {}
+                
+                function dropdownMethods:Set(newOption)
                     if table.find(options, newOption) then
                         selectedOption = newOption
                         MainButton.Text = name..": "..tostring(selectedOption)
                     end
                 end
                 
-                DropdownFrame.Get = function()
+                function dropdownMethods:Get()
                     return selectedOption
                 end
                 
-                DropdownFrame.Update = function(newOptions, newDefault)
+                function dropdownMethods:Update(newOptions, newDefault)
                     options = newOptions or options
                     selectedOption = newDefault or selectedOption or (options and options[1]) or "Selecione"
                     MainButton.Text = name..": "..tostring(selectedOption)
@@ -636,14 +644,24 @@ function SimpleKavo.CreateLib(title, themeName)
                     end
                 end
                 
-                return addElement(DropdownFrame)
+                DropdownFrame.Parent = SectionContent
+                
+                -- Adiciona métodos ao frame de retorno
+                for name, func in pairs(dropdownMethods) do
+                    DropdownFrame[name] = func
+                end
+                
+                return DropdownFrame
             end
             
             function SectionFunctions:NewSlider(name, min, max, default, callback)
+                local elementOrder = #SectionContent:GetChildren()
+                
                 local SliderFrame = Instance.new("Frame")
                 SliderFrame.Name = name.."_Slider"
                 SliderFrame.BackgroundTransparency = 1
                 SliderFrame.Size = UDim2.new(1, 0, 0, 50)
+                SliderFrame.LayoutOrder = elementOrder
                 
                 local SliderText = Instance.new("TextLabel")
                 SliderText.Name = "Text"
@@ -707,7 +725,8 @@ function SimpleKavo.CreateLib(title, themeName)
                     end
                 end)
                 
-                return addElement(SliderFrame)
+                SliderFrame.Parent = SectionContent
+                return SliderFrame
             end
             
             return SectionFunctions
