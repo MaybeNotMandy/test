@@ -221,7 +221,7 @@ function SimpleKavo.CreateLib(title, themeName)
     Content.Position = UDim2.new(0, 150, 0, 30)
     Content.Size = UDim2.new(1, -150, 1, -30)
     
-    -- Variável para controlar a ordem das tabs
+    -- Variável para controlar as tabs
     local tabsOrder = {}
     local currentTab = nil
     
@@ -237,7 +237,9 @@ function SimpleKavo.CreateLib(title, themeName)
         TabButton.TextSize = 14
         TabButton.AnchorPoint = Vector2.new(0.5, 0)
         TabButton.Position = UDim2.new(0.35, -10, 0, 0)
-        TabButton.LayoutOrder = #tabsOrder + 1
+        
+        -- Definir LayoutOrder baseado no número atual de filhos
+        TabButton.LayoutOrder = #TabsHolder:GetChildren()
         
         local TabCorner = Instance.new("UICorner")
         TabCorner.CornerRadius = UDim.new(0, 4)
@@ -736,7 +738,9 @@ function SimpleKavo.CreateLib(title, themeName)
     end
     
     return {
-        AddTab = SimpleKavo.AddTab,
+        AddTab = function(name)
+            return SimpleKavo:AddTab(name)
+        end,
         ToggleUI = function()
             ScreenGui.Enabled = not ScreenGui.Enabled
         end,
