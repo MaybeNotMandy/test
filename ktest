@@ -237,7 +237,9 @@ function SimpleKavo.CreateLib(title, themeName)
         TabButton.TextSize = 14
         TabButton.AnchorPoint = Vector2.new(0.5, 0)
         TabButton.Position = UDim2.new(0.35, -10, 0, 0)
-        TabButton.LayoutOrder = #tabsOrder + 1
+        
+        -- Usar o número atual de filhos como LayoutOrder para manter a ordem de criação
+        TabButton.LayoutOrder = #TabsHolder:GetChildren()
         
         local TabCorner = Instance.new("UICorner")
         TabCorner.CornerRadius = UDim.new(0, 4)
@@ -260,10 +262,11 @@ function SimpleKavo.CreateLib(title, themeName)
         TabContentList.HorizontalAlignment = Enum.HorizontalAlignment.Center
         
         -- Adiciona a tab à lista de ordem
-        table.insert(tabsOrder, {
+        local tabData = {
             button = TabButton,
             content = TabContent
-        })
+        }
+        table.insert(tabsOrder, tabData)
         
         TabButton.MouseButton1Click:Connect(function()
             -- Esconde todas as tabs
