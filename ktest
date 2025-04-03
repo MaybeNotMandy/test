@@ -181,116 +181,111 @@ function SimpleKavo.CreateLib(title, themeName)
     
     SimpleKavo:DraggingEnabled(Header, Main)
     
-    -- ScrollingFrame Configuration
-local TabsScroll = Instance.new("ScrollingFrame")
-TabsScroll.Name = "TabsScroll"
-TabsScroll.Parent = Main
-TabsScroll.BackgroundTransparency = 1
-TabsScroll.Position = UDim2.new(0, 20, 0, 30)
-TabsScroll.Size = UDim2.new(0, 140, 1, -30)
-TabsScroll.ScrollBarThickness = 5
-TabsScroll.ScrollBarImageColor3 = theme.SchemeColor
-TabsScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
-TabsScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
-TabsScroll.ScrollingDirection = Enum.ScrollingDirection.Y
-TabsScroll.VerticalScrollBarInset = Enum.ScrollBarInset.Always
+    local TabsScroll = Instance.new("ScrollingFrame")
+    TabsScroll.Name = "TabsScroll"
+    TabsScroll.Parent = Main
+    TabsScroll.BackgroundTransparency = 1
+    TabsScroll.Position = UDim2.new(0, 20, 0, 30)
+    TabsScroll.Size = UDim2.new(0, 140, 1, -30)
+    TabsScroll.ScrollBarThickness = 5
+    TabsScroll.ScrollBarImageColor3 = theme.SchemeColor
+    TabsScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    TabsScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+    TabsScroll.ScrollingDirection = Enum.ScrollingDirection.Y
+    TabsScroll.VerticalScrollBarInset = Enum.ScrollBarInset.Always
 
-local TabsHolder = Instance.new("Frame")
-TabsHolder.Name = "TabsHolder"
-TabsHolder.Parent = TabsScroll
-TabsHolder.BackgroundTransparency = 1
-TabsHolder.Size = UDim2.new(1, 0, 0, 0)
-TabsHolder.AutomaticSize = Enum.AutomaticSize.Y
+    local TabsHolder = Instance.new("Frame")
+    TabsHolder.Name = "TabsHolder"
+    TabsHolder.Parent = TabsScroll
+    TabsHolder.BackgroundTransparency = 1
+    TabsHolder.Size = UDim2.new(1, 0, 0, 0)
+    TabsHolder.AutomaticSize = Enum.AutomaticSize.Y
 
-local TabsList = Instance.new("UIListLayout")
-TabsList.Parent = TabsHolder
-TabsList.Padding = UDim.new(0, 5)
-TabsList.SortOrder = Enum.SortOrder.LayoutOrder
-TabsList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-    TabsHolder.Size = UDim2.new(1, 0, 0, TabsList.AbsoluteContentSize.Y)
-    if #TabsHolder:GetChildren() > 5 then
-        TabsScroll.CanvasSize = UDim2.new(0, 0, 0, TabsList.AbsoluteContentSize.Y)
-    else
-        TabsScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
-    end
-end)
-
-local Content = Instance.new("Frame")
-Content.Name = "Content"
-Content.Parent = Main
-Content.BackgroundTransparency = 1
-Content.Position = UDim2.new(0, 150, 0, 30)
-Content.Size = UDim2.new(1, -150, 1, -30)
-
--- Variável para controlar a ordem das tabs
-local tabsOrder = {}
-local currentTab = nil
-
-function SimpleKavo:AddTab(name)
-    local TabButton = Instance.new("TextButton")
-    TabButton.Name = name
-    TabButton.Parent = TabsHolder
-    TabButton.BackgroundColor3 = theme.ElementColor
-    TabButton.Size = UDim2.new(0.9, 0, 0, 30)
-    TabButton.Font = Enum.Font.Gotham
-    TabButton.Text = name
-    TabButton.TextColor3 = theme.TextColor
-    TabButton.TextSize = 14
-    TabButton.AnchorPoint = Vector2.new(0.5, 0)
-    TabButton.Position = UDim2.new(0.35, -10, 0, 0)
-
-    local TabCorner = Instance.new("UICorner")
-    TabCorner.CornerRadius = UDim.new(0, 4)
-    TabCorner.Parent = TabButton
-
-    local TabContent = Instance.new("ScrollingFrame")
-    TabContent.Name = name.."_Content"
-    TabContent.Parent = Content
-    TabContent.BackgroundTransparency = 1
-    TabContent.Size = UDim2.new(1, 0, 1, 0)
-    TabContent.Visible = false
-    TabContent.ScrollBarThickness = 5
-    TabContent.ScrollBarImageColor3 = theme.SchemeColor
-    TabContent.CanvasSize = UDim2.new(0, 0, 0, 0)
-    TabContent.AutomaticCanvasSize = Enum.AutomaticSize.Y
-
-    local TabContentList = Instance.new("UIListLayout")
-    TabContentList.Parent = TabContent
-    TabContentList.Padding = UDim.new(0, 10)
-    TabContentList.HorizontalAlignment = Enum.HorizontalAlignment.Center
-
-    -- Adiciona a tab à lista de ordem e define o LayoutOrder corretamente
-    table.insert(tabsOrder, {
-        button = TabButton,
-        content = TabContent
-    })
-
-    -- Define a ordem correta
-    TabButton.LayoutOrder = #tabsOrder
-
-    TabButton.MouseButton1Click:Connect(function()
-        -- Esconde todas as tabs
-        for _, tab in ipairs(tabsOrder) do
-            tab.content.Visible = false
-            Tween(tab.button, {BackgroundColor3 = theme.ElementColor}, 0.2)
+    local TabsList = Instance.new("UIListLayout")
+    TabsList.Parent = TabsHolder
+    TabsList.Padding = UDim.new(0, 5)
+    TabsList.SortOrder = Enum.SortOrder.LayoutOrder
+    TabsList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        TabsHolder.Size = UDim2.new(1, 0, 0, TabsList.AbsoluteContentSize.Y)
+        if #TabsHolder:GetChildren() > 5 then
+            TabsScroll.CanvasSize = UDim2.new(0, 0, 0, TabsList.AbsoluteContentSize.Y)
+        else
+            TabsScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
         end
-
-        -- Mostra apenas a tab clicada
-        TabContent.Visible = true
-        Tween(TabButton, {BackgroundColor3 = theme.SchemeColor}, 0.2)
-        currentTab = TabContent
     end)
-
-    -- Ativa a primeira tab criada
-    if #tabsOrder == 1 then
-        TabContent.Visible = true
-        Tween(TabButton, {BackgroundColor3 = theme.SchemeColor}, 0.2)
-        currentTab = TabContent
-    end
-
-    local TabFunctions = {}
-    return TabFunctions
-end
+    
+    local Content = Instance.new("Frame")
+    Content.Name = "Content"
+    Content.Parent = Main
+    Content.BackgroundTransparency = 1
+    Content.Position = UDim2.new(0, 150, 0, 30)
+    Content.Size = UDim2.new(1, -150, 1, -30)
+    
+    -- Variável para controlar a ordem das tabs
+    local tabsOrder = {}
+    local currentTab = nil
+    
+    function SimpleKavo:AddTab(name)
+        local TabButton = Instance.new("TextButton")
+        TabButton.Name = name
+        TabButton.Parent = TabsHolder
+        TabButton.BackgroundColor3 = theme.ElementColor
+        TabButton.Size = UDim2.new(0.9, 0, 0, 30)
+        TabButton.Font = Enum.Font.Gotham
+        TabButton.Text = name
+        TabButton.TextColor3 = theme.TextColor
+        TabButton.TextSize = 14
+        TabButton.AnchorPoint = Vector2.new(0.5, 0)
+        TabButton.Position = UDim2.new(0.35, -10, 0, 0)
+        TabButton.LayoutOrder = #tabsOrder + 1
+        
+        local TabCorner = Instance.new("UICorner")
+        TabCorner.CornerRadius = UDim.new(0, 4)
+        TabCorner.Parent = TabButton
+        
+        local TabContent = Instance.new("ScrollingFrame")
+        TabContent.Name = name.."_Content"
+        TabContent.Parent = Content
+        TabContent.BackgroundTransparency = 1
+        TabContent.Size = UDim2.new(1, 0, 1, 0)
+        TabContent.Visible = false
+        TabContent.ScrollBarThickness = 5
+        TabContent.ScrollBarImageColor3 = theme.SchemeColor
+        TabContent.CanvasSize = UDim2.new(0, 0, 0, 0)
+        TabContent.AutomaticCanvasSize = Enum.AutomaticSize.Y
+        
+        local TabContentList = Instance.new("UIListLayout")
+        TabContentList.Parent = TabContent
+        TabContentList.Padding = UDim.new(0, 10)
+        TabContentList.HorizontalAlignment = Enum.HorizontalAlignment.Center
+        
+        -- Adiciona a tab à lista de ordem
+        table.insert(tabsOrder, {
+            button = TabButton,
+            content = TabContent
+        })
+        
+        TabButton.MouseButton1Click:Connect(function()
+            -- Esconde todas as tabs
+            for _, tab in ipairs(tabsOrder) do
+                tab.content.Visible = false
+                Tween(tab.button, {BackgroundColor3 = theme.ElementColor}, 0.2)
+            end
+            
+            -- Mostra apenas a tab clicada
+            TabContent.Visible = true
+            Tween(TabButton, {BackgroundColor3 = theme.SchemeColor}, 0.2)
+            currentTab = TabContent
+        end)
+        
+        -- Ativa a primeira tab criada
+        if #tabsOrder == 1 then
+            TabContent.Visible = true
+            Tween(TabButton, {BackgroundColor3 = theme.SchemeColor}, 0.2)
+            currentTab = TabContent
+        end
+        
+        local TabFunctions = {}
         
         function TabFunctions:NewSection(name)
             local SectionFrame = Instance.new("Frame")
