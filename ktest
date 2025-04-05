@@ -534,61 +534,51 @@ function SimpleKavo.CreateLib(title, themeName)
                         return
                     end
                     
-                    local function createOptions()
-                        -- Converte para tabela se for string
-                        if typeof(options) == "string" then
-                            options = {options}
-                        elseif typeof(options) ~= "table" then
-                            warn("Esperado 'options' como tabela ou string, mas recebeu: " .. typeof(options))
-                            return
-                        end
-                    
-                        for i, option in ipairs(options) do
-                            local OptionButton = Instance.new("TextButton")
-                            OptionButton.Name = tostring(option)
-                            OptionButton.Parent = OptionsFrame
-                            OptionButton.BackgroundColor3 = theme.ElementColor
-                            OptionButton.Size = UDim2.new(1, -10, 0, 30)
-                            OptionButton.Position = UDim2.new(0, 5, 0, 0)
-                            OptionButton.Font = Enum.Font.Gotham
-                            OptionButton.Text = tostring(option)
-                            OptionButton.TextColor3 = theme.TextColor
-                            OptionButton.TextSize = 14
-                            OptionButton.AutoButtonColor = false
-                    
-                            local OptionCorner = Instance.new("UICorner")
-                            OptionCorner.CornerRadius = UDim.new(0, 4)
-                            OptionCorner.Parent = OptionButton
-                    
-                            OptionButton.MouseButton1Click:Connect(function()
-                                selectedOption = option
-                                MainButton.Text = name..": "..tostring(selectedOption)
-                                isOpen = false
-                                OptionsFrame.Visible = false
-                                Tween(OptionsFrame, {Size = UDim2.new(1, 0, 0, 0)}, 0.2)
-                                Tween(DropdownFrame, {Size = UDim2.new(1, 0, 0, 35)}, 0.2)
-                                Tween(Arrow, {Rotation = 0}, 0.2)
-                                if callback then callback(option) end
-                            end)
-                    
-                            OptionButton.MouseEnter:Connect(function()
-                                Tween(OptionButton, {
-                                    BackgroundColor3 = Color3.fromRGB(
-                                        math.clamp(math.floor(theme.ElementColor.R * 255 + 20), 0, 255),
-                                        math.clamp(math.floor(theme.ElementColor.G * 255 + 20), 0, 255),
-                                        math.clamp(math.floor(theme.ElementColor.B * 255 + 20), 0, 255)
-                                    )
-                                }, 0.1)
-                            end)
-                    
-                            OptionButton.MouseLeave:Connect(function()
-                                Tween(OptionButton, {BackgroundColor3 = theme.ElementColor}, 0.1)
-                            end)
-                        end
+                    for i, option in ipairs(options) do
+                        local OptionButton = Instance.new("TextButton")
+                        OptionButton.Name = tostring(option)
+                        OptionButton.Parent = OptionsFrame
+                        OptionButton.BackgroundColor3 = theme.ElementColor
+                        OptionButton.Size = UDim2.new(1, -10, 0, 30)
+                        OptionButton.Position = UDim2.new(0, 5, 0, 0)
+                        OptionButton.Font = Enum.Font.Gotham
+                        OptionButton.Text = tostring(option)
+                        OptionButton.TextColor3 = theme.TextColor
+                        OptionButton.TextSize = 14
+                        OptionButton.AutoButtonColor = false
+                        
+                        local OptionCorner = Instance.new("UICorner")
+                        OptionCorner.CornerRadius = UDim.new(0, 4)
+                        OptionCorner.Parent = OptionButton
+                        
+                        OptionButton.MouseButton1Click:Connect(function()
+                            selectedOption = option
+                            MainButton.Text = name..": "..tostring(selectedOption)
+                            isOpen = false
+                            OptionsFrame.Visible = false
+                            Tween(OptionsFrame, {Size = UDim2.new(1, 0, 0, 0)}, 0.2)
+                            Tween(DropdownFrame, {Size = UDim2.new(1, 0, 0, 35)}, 0.2)
+                            Tween(Arrow, {Rotation = 0}, 0.2)
+                            if callback then callback(option) end
+                        end)
+                        
+                        OptionButton.MouseEnter:Connect(function()
+                            Tween(OptionButton, {
+                                BackgroundColor3 = Color3.fromRGB(
+                                    math.floor(theme.ElementColor.R * 255 + 20),
+                                    math.floor(theme.ElementColor.G * 255 + 20),
+                                    math.floor(theme.ElementColor.B * 255 + 20)
+                                )
+                            }, 0.1)
+                        end)
+                        
+                        OptionButton.MouseLeave:Connect(function()
+                            Tween(OptionButton, {BackgroundColor3 = theme.ElementColor}, 0.1)
+                        end)
                     end
-                    
-                    createOptions()
-                    
+                end
+                
+                createOptions()
                 
                 -- Função para abrir/fechar o dropdown
                 local function toggleDropdown()
